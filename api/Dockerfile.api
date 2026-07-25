@@ -1,17 +1,10 @@
-# LankaAgent API — Dockerfile (Multi-stage, Production-Ready)
+# LankaAgent API — Dockerfile (Multi-stage, pip-based)
 
-# ─────────────────────────────────────────────────────────────
-# BASE STAGE — Common dependencies
-# ─────────────────────────────────────────────────────────────
 FROM python:3.12-slim AS base
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
-    PIP_NO_CACHE_DIR=1 \
-    PIP_DISABLE_PIP_VERSION_CHECK=1 \
-    POETRY_VERSION=1.8.3 \
-    POETRY_HOME="/opt/poetry" \
-    POETRY_VIRTUALENVS_CREATE=false
+    PIP_NO_CACHE_DIR=1
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
@@ -19,51 +12,29 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
-RUN curl -sSL https://install.python-poetry.org | python3 - \
-    && ln -s /opt/poetry/bin/poetry /usr/local/bin/poetry
-
 WORKDIR /app
 
-# ─────────────────────────────────────────────────────────────
-# DEPENDENCIES STAGE — Install Python packages
-# ─────────────────────────────────────────────────────────────
+# Dependencies
 FROM base AS deps
 
-COPY pyproject.toml poetry.lock* ./
-RUN poetry install --only=main --no-interaction --no-ansi
+COPY requirements.txt .
+RUN pip install --no-cache-dir --timeout 120 -r requirements.txt
 
-# ─────────────────────────────────────────────────────────────
-# DEVELOPMENT STAGE — With dev dependencies
-# ─────────────────────────────────────────────────────────────
+# Development
 FROM deps AS development
 
-RUN poetry install --with=dev --no-interaction --no-ansi
-
-COPY . .
+COPY ./app ./app
+COPY ./tests ./tests
 
 EXPOSE 8000
 
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
 
-# ─────────────────────────────────────────────────────────────
-# BUILD STAGE — Compile bytecode, collect static
-# ─────────────────────────────────────────────────────────────
-FROM deps AS build
-
-COPY . .
-
-RUN python -m compileall -q app/ \
-    && find . -type f -name "*.pyc" -delete \
-    && find . -type d -name "__pycache__" -delete
-
-# ─────────────────────────────────────────────────────────────
-# PRODUCTION STAGE — Minimal runtime
-# ─────────────────────────────────────────────────────────────
+# Production
 FROM python:3.12-slim AS production
 
 ENV PYTHONUNBUFFERED=1 \
-    PYTHONDONTWRITEBYTECODE=1 \
-    PATH="/app/.venv/bin:$PATH"
+    PYTHONDONTWRITEBYTECODE=1
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libpq5 \
@@ -74,7 +45,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 WORKDIR /app
 
 COPY --from=deps /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
-COPY --from=build /app /app
+COPY ./app ./app
 
 RUN chown -R appuser:appuser /app
 

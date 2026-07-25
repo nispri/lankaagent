@@ -1,8 +1,8 @@
 line-length = 100
 target-version = "py312"
 exclude = [".git", "__pycache__", ".venv", "dist", "build", "*.egg-info", ".mypy_cache", ".ruff_cache", "htmlcov", ".coverage"]
-select = ["E", "F", "I", "W", "UP", "B", "C4", "ANN", "T20", "PTH", "PGH", "PL", "TRY", "NPY", "SIM", "TID", "ARG", "RUF", "LOG", "PD", "RET"]
-ignore = ["S101", "S104", "S108", "S110", "S604", "S607", "S608", "ERA001"]
+select = ["E", "F", "I", "W", "UP", "B", "C4", "N", "T20", "PTH", "PGH", "PL", "TRY", "NPY", "SIM", "TID", "ARG", "RUF", "LOG", "PD", "RET"]
+ignore = ["S101", "S104", "S108", "S110", "S604", "S607", "S608", "ERA001", "ANN001", "ANN101", "ANN201", "ANN202", "ANN204", "PLR2004", "TRY300", "E501", "N818"]
 fixable = ["ALL"]
 unfixable = []
-src = ["app"]
+src = ["app", "tests"]

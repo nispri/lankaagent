@@ -1,7 +1,7 @@
 """Leads endpoints"""
 from uuid import UUID
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter
 
 router = APIRouter()
 

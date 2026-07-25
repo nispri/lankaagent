@@ -11,7 +11,7 @@ class LankaAgentException(Exception):
     detail: str = "Internal server error"
     error_code: str = "INTERNAL_ERROR"
 
-    def __init__(self, detail: str | None = None, status_code: int | None = None):
+    def __init__(self: "LankaAgentException", detail: str | None = None, status_code: int | None = None) -> None:
         if detail:
             self.detail = detail
         if status_code:
@@ -60,7 +60,7 @@ class PaymentRequiredException(LankaAgentException):
     detail = "Subscription payment required"
 
 
-async def lankaagent_exception_handler(request: Request, exc: LankaAgentException) -> JSONResponse:
+async def lankaagent_exception_handler(request: Request, exc: LankaAgentException) -> JSONResponse:  # noqa: ARG001
     """Global exception handler for LankaAgent exceptions"""
     return JSONResponse(
         status_code=exc.status_code,

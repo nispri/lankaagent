@@ -4,6 +4,12 @@ LankaAgent API — FastAPI Application Entry Point
 from contextlib import asynccontextmanager
 
 import structlog
+from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
+from fastapi.responses import JSONResponse
+from sqlalchemy import text
+
 from app.api.v1.router import api_router
 from app.core.config import settings
 from app.core.database import Base, engine
@@ -15,10 +21,6 @@ from app.core.middleware import (
     TenantMiddleware,
 )
 from app.core.redis import redis_client
-from fastapi import FastAPI, Request
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.middleware.gzip import GZipMiddleware
-from fastapi.responses import JSONResponse
 
 # Configure structured logging
 structlog.configure(
@@ -42,7 +44,7 @@ logger = structlog.get_logger()
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):  # noqa: ANN201, ARG001
+async def lifespan(app: FastAPI):  # noqa: ARG001
     """Application lifespan events"""
     # Startup
     logger.info("Starting LankaAgent API", version=settings.APP_VERSION)
@@ -115,7 +117,7 @@ def create_app() -> FastAPI:
         # Check database
         try:
             async with engine.connect() as conn:
-                await conn.execute("SELECT 1")
+                await conn.execute(text("SELECT 1"))
             checks["database"] = True
         except Exception:
             pass
@@ -166,5 +168,5 @@ if __name__ == "__main__":
         host="0.0.0.0",
         port=8000,
         reload=settings.ENVIRONMENT == "development",
-        log_config=None,  # Use structlog
+        log_config=None,
     )

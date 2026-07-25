@@ -2,9 +2,9 @@
 LankaAgent — SQLAlchemy Models (Multi-Tenant via RLS)
 """
 import uuid
-from datetime import date, datetime
 
 from sqlalchemy import (
+    JSON,
     Boolean,
     Column,
     Date,
@@ -12,7 +12,6 @@ from sqlalchemy import (
     Float,
     ForeignKey,
     Integer,
-    JSON,
     String,
     Text,
     func,
@@ -44,7 +43,8 @@ class User(Base):
     __tablename__ = "users"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    tenant_id = Column(UUID(as_uuid=True), ForeignKey("tenants.id", ondelete="CASCADE"), nullable=False)
+    tenant_id = Column(UUID(as_uuid=True),
+                       ForeignKey("tenants.id", ondelete="CASCADE"), nullable=False)
     email = Column(String(255), nullable=False, index=True)
     password_hash = Column(String(255), nullable=False)
     full_name = Column(String(255))
@@ -62,7 +62,8 @@ class Lead(Base):
     __tablename__ = "leads"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    tenant_id = Column(UUID(as_uuid=True), ForeignKey("tenants.id", ondelete="CASCADE"), nullable=False)
+    tenant_id = Column(UUID(as_uuid=True),
+                       ForeignKey("tenants.id", ondelete="CASCADE"), nullable=False)
     source = Column(String(50), nullable=False)
     external_id = Column(String(255))
     contact_name = Column(String(255))
@@ -83,7 +84,8 @@ class Conversation(Base):
     __tablename__ = "conversations"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    tenant_id = Column(UUID(as_uuid=True), ForeignKey("tenants.id", ondelete="CASCADE"), nullable=False)
+    tenant_id = Column(UUID(as_uuid=True),
+                       ForeignKey("tenants.id", ondelete="CASCADE"), nullable=False)
     lead_id = Column(UUID(as_uuid=True), ForeignKey("leads.id", ondelete="SET NULL"))
     channel = Column(String(50), nullable=False)
     external_thread_id = Column(String(255))
@@ -98,7 +100,8 @@ class Message(Base):
     __tablename__ = "messages"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    conversation_id = Column(UUID(as_uuid=True), ForeignKey("conversations.id", ondelete="CASCADE"), nullable=False)
+    conversation_id = Column(UUID(as_uuid=True),
+                             ForeignKey("conversations.id", ondelete="CASCADE"), nullable=False)
     role = Column(String(50), nullable=False)
     content = Column(Text, nullable=False)
     tool_calls = Column(JSON)
@@ -112,7 +115,8 @@ class Itinerary(Base):
     __tablename__ = "itineraries"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    tenant_id = Column(UUID(as_uuid=True), ForeignKey("tenants.id", ondelete="CASCADE"), nullable=False)
+    tenant_id = Column(UUID(as_uuid=True),
+                       ForeignKey("tenants.id", ondelete="CASCADE"), nullable=False)
     lead_id = Column(UUID(as_uuid=True), ForeignKey("leads.id", ondelete="CASCADE"))
     version = Column(Integer, default=1)
     title = Column(String(255), nullable=False)
@@ -132,7 +136,8 @@ class Booking(Base):
     __tablename__ = "bookings"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    tenant_id = Column(UUID(as_uuid=True), ForeignKey("tenants.id", ondelete="CASCADE"), nullable=False)
+    tenant_id = Column(UUID(as_uuid=True),
+                       ForeignKey("tenants.id", ondelete="CASCADE"), nullable=False)
     lead_id = Column(UUID(as_uuid=True), ForeignKey("leads.id", ondelete="SET NULL"))
     itinerary_id = Column(UUID(as_uuid=True), ForeignKey("itineraries.id", ondelete="SET NULL"))
     booking_reference = Column(String(50), unique=True, nullable=False, index=True)
@@ -154,7 +159,8 @@ class Payment(Base):
     __tablename__ = "payments"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    tenant_id = Column(UUID(as_uuid=True), ForeignKey("tenants.id", ondelete="CASCADE"), nullable=False)
+    tenant_id = Column(UUID(as_uuid=True),
+                       ForeignKey("tenants.id", ondelete="CASCADE"), nullable=False)
     booking_id = Column(UUID(as_uuid=True), ForeignKey("bookings.id", ondelete="CASCADE"))
     amount_usd = Column(Float(precision=2))
     amount_lkr = Column(Float(precision=2))
@@ -172,7 +178,8 @@ class WellnessProtocol(Base):
     __tablename__ = "wellness_protocols"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    tenant_id = Column(UUID(as_uuid=True), ForeignKey("tenants.id", ondelete="CASCADE"), nullable=False)
+    tenant_id = Column(UUID(as_uuid=True),
+                       ForeignKey("tenants.id", ondelete="CASCADE"), nullable=False)
     lead_id = Column(UUID(as_uuid=True), ForeignKey("leads.id", ondelete="CASCADE"))
     health_intake = Column(JSON, nullable=False)
     recommended_treatments = Column(JSON, nullable=False)
@@ -188,7 +195,8 @@ class AnalyticsEvent(Base):
     __tablename__ = "analytics_events"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    tenant_id = Column(UUID(as_uuid=True), ForeignKey("tenants.id", ondelete="CASCADE"))
+    tenant_id = Column(UUID(as_uuid=True),
+                       ForeignKey("tenants.id", ondelete="CASCADE"))
     event_name = Column(String(255), nullable=False)
     properties = Column(JSON, default=dict)
     user_id = Column(UUID(as_uuid=True))

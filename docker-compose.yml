@@ -14,7 +14,7 @@ services:
     environment:
       POSTGRES_DB: lankaagent
       POSTGRES_USER: ${POSTGRES_USER:-lankaagent}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-lankaagent_dev_pass}
       POSTGRES_INITDB_ARGS: "--auth-host=scram-sha-256"
     volumes:
       - postgres_data:/var/lib/postgresql/data
@@ -63,55 +63,26 @@ services:
   api:
     build:
       context: .
-      dockerfile: Dockerfile.api
-      target: production
+      dockerfile: api/Dockerfile.api
+      target: development
     container_name: lankaagent-api
     environment:
       # Core
-      - ENVIRONMENT=production
-      - DATABASE_URL=postgresql://${POSTGRES_USER:-lankaagent}:${POSTGRES_PASSWORD}@postgres:5432/lankaagent
+      - ENVIRONMENT=development
+      - DATABASE_URL=postgresql+asyncpg://${POSTGRES_USER:-lankaagent}:${POSTGRES_PASSWORD:-lankaagent_dev_pass}@postgres:5432/lankaagent
       - REDIS_URL=redis://redis:6379/0
-      - SECRET_KEY=${SECRET_KEY}
+      - SECRET_KEY=${SECRET_KEY:-this-is-a-dev-secret-key-that-is-at-least-32-char}
       - JWT_ALGORITHM=HS256
       - ACCESS_TOKEN_EXPIRE_MINUTES=30
       - DEFAULT_TENANT_SCHEMA=public
-      
-      # WhatsApp
-      - TWILIO_ACCOUNT_SID=${TWILIO_ACCOUNT_SID}
-      - TWILIO_AUTH_TOKEN=${TWILIO_AUTH_TOKEN}
-      - TWILIO_WHATSAPP_NUMBER=${TWILIO_WHATSAPP_NUMBER}
-      - META_VERIFY_TOKEN=${META_VERIFY_TOKEN}
-      - META_APP_SECRET=${META_APP_SECRET}
-      
-      # Payments
-      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
-      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET}
-      - PAYHERE_MERCHANT_ID=${PAYHERE_MERCHANT_ID}
-      - PAYHERE_MERCHANT_SECRET=${PAYHERE_MERCHANT_SECRET}
-      - PAYHERE_SANDBOX=${PAYHERE_SANDBOX:-true}
-      
-      # MCP
-      - MCP_SERVER_URL=http://mcp:8000
-      - MCP_API_KEY=${MCP_API_KEY}
-      
-      # External
-      - GOOGLE_CALENDAR_CLIENT_ID=${GOOGLE_CALENDAR_CLIENT_ID}
-      - GOOGLE_CALENDAR_CLIENT_SECRET=${GOOGLE_CALENDAR_CLIENT_SECRET}
-      - POSTHOG_API_KEY=${POSTHOG_API_KEY}
-      - SENTRY_DSN=${SENTRY_DSN}
-      
-      # Feature Flags
-      - ENABLE_WELLNESS_ENGINE=true
-      - ENABLE_MULTILINGUAL=true
-      - LOG_LEVEL=info
+      - MOCK_EXTERNAL_APIS=true
+      - LOG_LEVEL=debug
     ports:
       - "8000:8000"
     depends_on:
       postgres:
         condition: service_healthy
       redis:
-        condition: service_healthy
-      mcp:
         condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
@@ -177,7 +148,6 @@ services:
     build:
       context: ./mcp_servers
       dockerfile: Dockerfile
-      target: production
     container_name: lankaagent-mcp
     environment:
       - ENVIRONMENT=production
