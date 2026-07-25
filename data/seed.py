@@ -1,5 +1,5 @@
 """
-Ceylonia Holidays — Database Seed Script
+Ceyloria Holidays — Database Seed Script
 Run: docker compose exec api python data/seed.py
 """
 import asyncio
@@ -21,25 +21,25 @@ from data.tour_data import ATTRACTIONS, HOTELS, ITINERARY, SAMPLE_INQUIRY, TOUR_
 
 
 async def seed() -> None:
-    """Seed database with Ceylonia Holidays data"""
+    """Seed database with Ceyloria Holidays data"""
 
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
     async with async_session_factory() as session:
-        # 1. Create Ceylonia Holidays tenant
+        # 1. Create Ceyloria Holidays tenant
         tenant = Tenant(
             id=uuid.UUID("11111111-1111-1111-1111-111111111111"),
-            name="Ceylonia Holidays",
-            slug="ceylonia-holidays",
+            name="Ceyloria Holidays",
+            slug="ceyloria-holidays",
             plan="enterprise",
             settings={
-                "brand_name": "Ceylonia Holidays",
+                "brand_name": "Ceyloria Holidays",
                 "tagline": "Glimpses of Ceylon",
                 "currency": "USD",
                 "languages": ["en", "ru", "de", "fr", "zh", "si", "ta"],
                 "whatsapp_number": "+94 77 123 4567",
-                "website": "https://ceyloniaholidays.com",
+                "website": "https://ceyloriaholidays.com",
                 "tours": TOUR_PRICING,
                 "hotels": HOTELS,
                 "attractions": ATTRACTIONS,

@@ -1,5 +1,5 @@
 """
-Ceylonia Holidays — Tour Packages (2026 Updated Pricing)
+Ceyloria Holidays — Tour Packages (2026 Updated Pricing)
 """
 
 # ─────────────────────────────────────────────────────────────
