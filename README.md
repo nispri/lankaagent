@@ -1,6 +1,6 @@
 # LankaAgent — AI Travel Concierge for Sri Lanka Tour Operators
 
-[![CI](https://github.com/nishanthap/lankaagent/workflows/CI/badge.svg)](https://github.com/nishanthap/lankaagent/actions)
+[![CI](https://github.com/nispri/lankaagent/workflows/CI/badge.svg)](https://github.com/nispri/lankaagent/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
 
@@ -90,7 +90,7 @@ Operator Dashboard: Lead → Quote → Booking → Calendar (auto-synced)
 
 ### 1. Clone & Configure
 ```bash
-git clone https://github.com/nishanthap/lankaagent
+git clone https://github.com/nispri/lankaagent
 cd lankaagent
 
 cp .env.example .env
