@@ -7,7 +7,7 @@ mcp = FastMCP("LankaAgent Tourism Data", description="Sri Lanka tourism data too
 
 
 @mcp.tool(name="search_attractions")
-async def search_attractions(province: str | None = None, category: str | None = None, limit: int = 20) -> list[dict]:
+async def search_attractions(province: str | None = None, category: str | None = None, limit: int = 20) -> list[dict]:  # noqa: ARG001
     """Search Sri Lanka attractions by province and category"""
     return []
 

@@ -2,6 +2,7 @@
 LankaAgent MCP Server entry point
 """
 import sys
+
 from mcp_server import mcp
 
 
