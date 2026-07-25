@@ -69,22 +69,24 @@ Would you be open to a quick 10-min call this week?
 
 Warm regards,
 Nishantha Priyadarshana
+Director — Ceyloria Holidays
 ```
+
 
 ---
 
-## Channel 3: Kingslake Corporate Travel Partners
+### Channel 3: Ceyloria Partners (Your Business Network)
 
-**Strategy:** Your Manager title at Kingslake gives you internal credibility. Corporate travel is a different use case — focus on efficiency and cost savings.
+**Strategy:** Your own business network under the Ceyloria brand. Pitch as a fellow entrepreneur sharing a tool you built for yourself.
 
-### Forward-Ready Email for Kingslake Travel Partners
+### Forward-Ready Email for Ceyloria Partners
 
 ```
 Subject: AI-powered corporate travel concierge — pilot offer
 
 Hi [Name],
 
-As you know, I've been in systems and DevOps at Kingslake managing complex infrastructure. I've recently built an AI travel assistant that automates the entire travel booking flow from inquiry to confirmation.
+I've built an AI travel assistant that automates the entire travel booking flow from inquiry to confirmation. I'm using it for my own inbound tour company Ceyloria Holidays and I'm offering it to select partners.
 
 It handles:
 - 24/7 response in multiple languages
@@ -138,7 +140,7 @@ Start date: [Date]
 |-----|------|-------|
 | **Today** | Forward BIMARI message to your wife | ⬜ |
 | **Today** | Send SLTDA contact message | ⬜ |
-| **Today** | Send Kingslake partner message | ⬜ |
+| **Today** | Send Ceyloria partner message | ⬜ |
 | **After interest** | Forward Pilot Agreement | ⬜ |
 | **After signed** | Tell Hermes — I onboard them | ⬜ |
 
