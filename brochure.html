@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ceylonia Holidays — Glimpses of Ceylon 2026</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Inter',sans-serif;background:#0a0a0f;color:#e0e0e0;line-height:1.6}
+  .page{max-width:1000px;margin:0 auto;padding:40px 30px}
+  
+  /* Header */
+  .hero{text-align:center;padding:80px 0 60px;background:linear-gradient(135deg,#0a0a0f 0%,#1a1a2e 50%,#0f3460 100%);border-radius:20px;margin-bottom:40px;position:relative;overflow:hidden}
+  .hero::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");opacity:0.5}
+  .hero-content{position:relative;z-index:1}
+  .hero-badge{display:inline-block;background:#e94560;color:white;padding:6px 18px;border-radius:20px;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;margin-bottom:20px}
+  .hero h1{font-family:'Playfair Display',serif;font-size:56px;font-weight:700;color:#fff;margin-bottom:8px;letter-spacing:-1px}
+  .hero .tagline{font-size:22px;color:#e94560;font-weight:300;margin-bottom:12px}
+  .hero .subtitle{font-size:16px;color:#888;max-width:600px;margin:0 auto}
+  .hero .price-strip{margin-top:30px;display:flex;justify-content:center;gap:30px;flex-wrap:wrap}
+  .price-item{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:20px 28px;text-align:center;min-width:140px}
+  .price-item .amount{font-size:28px;font-weight:700;color:#fff}
+  .price-item .label{font-size:12px;color:#888;margin-top:4px}
+  .price-item .pax{font-size:11px;color:#e94560;font-weight:600}
+
+  /* Sections */
+  section{margin-bottom:50px}
+  h2{font-family:'Playfair Display',serif;font-size:32px;color:#fff;margin-bottom:24px;display:flex;align-items:center;gap:12px}
+  h2::after{content:'';flex:1;height:1px;background:linear-gradient(to right,rgba(233,69,96,0.5),transparent)}
+  h3{font-size:18px;color:#e94560;margin-bottom:8px;font-weight:600}
+  
+  /* Itinerary */
+  .day-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:20px;margin-bottom:12px;display:grid;grid-template-columns:60px 1fr;gap:16px;transition:all 0.2s}
+  .day-card:hover{background:rgba(255,255,255,0.06)}
+  .day-number{font-size:24px;font-weight:700;color:#e94560;line-height:1}
+  .day-location{font-size:11px;color:#888;text-transform:uppercase;letter-spacing:1px}
+  .day-title{font-size:16px;font-weight:600;color:#fff;margin-bottom:6px}
+  .day-details{font-size:13px;color:#aaa;line-height:1.5}
+  .day-highlights{margin-top:8px;display:flex;flex-wrap:wrap;gap:6px}
+  .day-highlight{background:rgba(233,69,96,0.1);color:#e94560;font-size:11px;padding:3px 10px;border-radius:12px}
+  .day-hotel{font-size:12px;color:#666;margin-top:6px}
+  
+  /* Pricing Table */
+  .pricing-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-top:20px}
+  .pricing-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:24px;text-align:center}
+  .pricing-card.featured{border-color:#e94560;background:rgba(233,69,96,0.08)}
+  .pricing-card .group{font-size:36px;font-weight:700;color:#fff}
+  .pricing-card .per{font-size:14px;color:#888;margin:4px 0}
+  .pricing-card .price{font-size:20px;font-weight:600;color:#e94560}
+  .pricing-card .note{font-size:11px;color:#666;margin-top:8px}
+  
+  /* Inclusions grid */
+  .inc-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .inc-item{padding:12px 16px;background:rgba(255,255,255,0.03);border-radius:8px;font-size:13px;display:flex;align-items:center;gap:10px}
+  .inc-item .icon{color:#e94560;font-size:16px}
+  .ex-item{color:#888;font-size:13px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.04)}
+  
+  /* Wellness Module */
+  .wellness-showcase{background:linear-gradient(135deg,rgba(233,69,96,0.1),rgba(15,52,96,0.2));border-radius:16px;padding:30px;display:grid;grid-template-columns:1fr 1fr;gap:24px}
+  .wellness-item{background:rgba(255,255,255,0.04);border-radius:10px;padding:16px}
+  .wellness-item h4{color:#e94560;font-size:14px;margin-bottom:4px}
+  .wellness-item p{font-size:12px;color:#aaa}
+  
+  /* WhatsApp CTA */
+  .cta-section{background:linear-gradient(135deg,#25D366,#128C7E);border-radius:16px;padding:40px;text-align:center;color:#fff;margin-top:40px}
+  .cta-section h2{color:#fff;justify-content:center;font-size:28px}
+  .cta-section h2::after{display:none}
+  .cta-section p{font-size:15px;margin-bottom:24px;opacity:0.9}
+  .cta-button{display:inline-block;background:#fff;color:#075E54;padding:14px 40px;border-radius:30px;font-weight:600;text-decoration:none;font-size:16px;transition:all 0.2s}
+  .cta-button:hover{transform:scale(1.05)}
+  .cta-note{font-size:12px;margin-top:16px;opacity:0.7}
+  
+  /* Footer */
+  footer{text-align:center;padding:40px 0;border-top:1px solid rgba(255,255,255,0.06);margin-top:40px}
+  footer .name{font-size:20px;font-weight:700;color:#fff}
+  footer .contact{color:#888;font-size:13px;margin-top:8px}
+  footer .contact span{margin:0 12px}
+  
+  @media(max-width:768px){
+    .hero h1{font-size:32px}
+    .wellness-showcase{grid-template-columns:1fr}
+    .inc-grid{grid-template-columns:1fr}
+    .pricing-grid{grid-template-columns:1fr 1fr}
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+<!-- Hero -->
+<div class="hero">
+  <div class="hero-content">
+    <div class="hero-badge">✨ Sri Lanka's Premium Tour Operator — Est. 2026</div>
+    <h1>Ceylonia Holidays</h1>
+    <div class="tagline">Glimpses of Ceylon</div>
+    <div class="subtitle">14 Days / 13 Nights — A curated journey through ancient kingdoms, misty highlands, wildlife safaris, and golden beaches.</div>
+    <div class="price-strip">
+      <div class="price-item"><div class="amount">$2,490</div><div class="label">per person</div><div class="pax">2 travelers</div></div>
+      <div class="price-item"><div class="amount">$2,190</div><div class="label">per person</div><div class="pax">4 travelers</div></div>
+      <div class="price-item"><div class="amount">$2,090</div><div class="label">per person</div><div class="pax">6 travelers</div></div>
+      <div class="price-item"><div class="amount">$1,990</div><div class="label">per person</div><div class="pax">10 travelers</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- AI Concierge Feature -->
+<section>
+  <h2>🤖 Your AI Travel Concierge</h2>
+  <div style="background:rgba(255,255,255,0.03);border-radius:16px;padding:30px;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px">
+    <div><h3>24/7 Instant Response</h3><p style="font-size:13px;color:#aaa">Inquiries answered in seconds — not hours. Never lose a lead while you sleep.</p></div>
+    <div><h3>12 Languages</h3><p style="font-size:13px;color:#aaa">English, Russian, German, Chinese, French, Arabic, Japanese, Korean, Sinhala, Tamil + more.</p></div>
+    <div><h3>Instant Itineraries</h3><p style="font-size:13px;color:#aaa">Custom day-by-day plans with real pricing generated in under 5 seconds.</p></div>
+    <div><h3>Secure Payments</h3><p style="font-size:13px;color:#aaa">Pay via credit card (Stripe) or local methods (PayHere). Deposit + balance.</p></div>
+    <div><h3>WhatsApp Native</h3><p style="font-size:13px;color:#aaa">Chat on WhatsApp — no app to download. Share photos, documents, live location.</p></div>
+    <div><h3>Ayurveda Wellness</h3><p style="font-size:13px;color:#aaa">Personalized health protocols from BIMARI-certified doctors. Add to any tour.</p></div>
+  </div>
+</section>
+
+<!-- Itinerary -->
+<section>
+  <h2>🗺️ Detailed Itinerary</h2>
+  
+  <div class="day-card"><div class="day-number">01<div class="day-location">Negombo</div></div><div><div class="day-title">Gateway to Paradise — Coastal Welcome</div><div class="day-details">Arrival at Bandaranaike International Airport. Warm Sri Lankan welcome. Transfer to Negombo beach town (20 min). Relax at Arie Lagoon beachfront hotel. Evening sunset stroll along golden sands.</div><div class="day-highlights"><span class="day-highlight">Airport pickup</span><span class="day-highlight">Beach relaxation</span><span class="day-highlight">Sunset walk</span></div><div class="day-hotel">🏨 Arie Lagoon (HB)</div></div></div>
+
+  <div class="day-card"><div class="day-number">02<div class="day-location">Anuradhapura</div></div><div><div class="day-title">Sacred Ancient Capital</div><div class="day-details">Journey to Anuradhapura UNESCO site. Visit Sri Maha Bodhi (oldest documented tree, 2,500+ years). Explore Ruwanwelisaya stupa with 344 stone elephant guardians. Samadhi Buddha statue. Isurumuniya Temple rock carvings.</div><div class="day-highlights"><span class="day-highlight">Sri Maha Bodhi</span><span class="day-highlight">Ruwanwelisaya</span><span class="day-highlight">Samadhi Buddha</span><span class="day-highlight">Isurumuniya Temple</span></div><div class="day-hotel">🏨 Alakamanda Hotel (HB)</div></div></div>
+
+  <div class="day-card"><div class="day-number">03<div class="day-location">Habarana</div></div><div><div class="day-title">Sigiriya & Wildlife Safari</div><div class="day-details">Ascend Sigiriya Rock Fortress — the "Eighth Wonder of the World." 1,200 steps past ancient frescoes and Mirror Wall. Panoramic 360° views. Afternoon Minneriya National Park safari — witness "The Gathering" of hundreds of elephants.</div><div class="day-highlights"><span class="day-highlight">Sigiriya Rock Fortress</span><span class="day-highlight">Ancient frescoes</span><span class="day-highlight">Minneriya Safari</span><span class="day-highlight">Elephant gathering</span></div><div class="day-hotel">🏨 Cinnamon Village (HB)</div></div></div>
+
+  <div class="day-card"><div class="day-number">04<div class="day-location">Habarana</div></div><div><div class="day-title">Medieval Kingdom & Village Life</div><div class="day-details">Explore Polonnaruwa UNESCO site — Royal Palace, Vatadage, Gal Vihara (4 Buddha statues carved from single granite rock face). Afternoon village tour: bullock cart ride, toddy tapping, king coconut water.</div><div class="day-highlights"><span class="day-highlight">Polonnaruwa ruins</span><span class="day-highlight">Gal Vihara statues</span><span class="day-highlight">Village tour</span><span class="day-highlight">Bullock cart ride</span></div><div class="day-hotel">🏨 Cinnamon Village (HB)</div></div></div>
+
+  <div class="day-card"><div class="day-number">05<div class="day-location">Kandy</div></div><div><div class="day-title">Golden Temple & Hill Capital</div><div class="day-details">Dambulla Cave Temple — 5 cave shrines, 150+ Buddha statues, 2,100 sq meters of ceiling frescoes. Matale Spice Garden tour. Scenic drive to Kandy. Evening lakeside stroll.</div><div class="day-highlights"><span class="day-highlight">Dambulla Cave Temple</span><span class="day-highlight">Spice Garden</span><span class="day-highlight">Kandy Lake</span></div><div class="day-hotel">🏨 Cinnamon Citadel (HB)</div></div></div>
+
+  <div class="day-card"><div class="day-number">06<div class="day-location">Kandy</div></div><div><div class="day-title">Sacred Tooth Relic & Culture</div><div class="day-details">Temple of the Sacred Tooth Relic — holiest Buddhist site in Sri Lanka. Witness daily pooja ceremonies. Kandy Market. Peradeniya Botanical Garden. Evening Kandyan Cultural Dance Show — drummers, acrobats, fire walkers.</div><div class="day-highlights"><span class="day-highlight">Temple of Tooth</span><span class="day-highlight">Botanical Garden</span><span class="day-highlight">Cultural Dance Show</span><span class="day-highlight">Kandy Market</span></div><div class="day-hotel">🏨 Cinnamon Citadel (HB)</div></div></div>
+
+  <div class="day-card"><div class="day-number">07<div class="day-location">Ella</div></div><div><div class="day-title">Tea Country Journey</div><div class="day-details">Tea plantation and factory tour — learn Ceylon tea processing. Tea tasting overlooking rolling hills. Haggala Botanical Garden at 5,500ft. Scenic drive through misty tea country. Ramboda Falls. Arrive in charming Ella village.</div><div class="day-highlights"><span class="day-highlight">Tea plantation tour</span><span class="day-highlight">Haggala Garden</span><span class="day-highlight">Tea tasting</span><span class="day-highlight">Scenic train ride</span></div><div class="day-hotel">🏨 EKHO Ella (HB)</div></div></div>
+
+  <div class="day-card"><div class="day-number">08<div class="day-location">Ella</div></div><div><div class="day-title">Mountain Vistas & Natural Wonders</div><div class="day-details">Little Adam's Peak hike (45 min, 360° views). Nine Arch Bridge — iconic colonial-era railway bridge. Ella Rock climb (optional). Ravana Falls waterfall. Ella Gap viewpoint. Charming local cafes.</div><div class="day-highlights"><span class="day-highlight">Little Adam's Peak</span><span class="day-highlight">Nine Arch Bridge</span><span class="day-highlight">Ravana Falls</span><span class="day-highlight">Ella Gap views</span></div><div class="day-hotel">🏨 EKHO Ella (HB)</div></div></div>
+
+  <div class="day-card"><div class="day-number">09<div class="day-location">Yala</div></div><div><div class="day-title">Leopard Territory</div><div class="day-details">Scenic drive from hill country to coastal plains. Afternoon Yala National Park safari — highest leopard density in the world. Expert tracker-guide. Possible sightings: leopards, elephants, sloth bears, crocodiles, 200+ bird species.</div><div class="day-highlights"><span class="day-highlight">Yala afternoon safari</span><span class="day-highlight">Leopard tracking</span><span class="day-highlight">Wildlife photography</span></div><div class="day-hotel">🏨 Cinnamon Wild (HB)</div></div></div>
+
+  <div class="day-card"><div class="day-number">10<div class="day-location">Yala</div></div><div><div class="day-title">Full Day Wildlife Adventure</div><div class="day-details">Dawn safari — optimal wildlife viewing. Multiple leopard territories. Elephant herds at watering holes. Sloth bear sightings (seasonal). Bird photography — bee-eaters, eagles, painted storks, hornbills. Relaxation at wildlife lodge between safaris.</div><div class="day-highlights"><span class="day-highlight">Dawn safari</span><span class="day-highlight">Full day wildlife</span><span class="day-highlight">Lodge relaxation</span></div><div class="day-hotel">🏨 Cinnamon Wild (HB)</div></div></div>
+
+  <div class="day-card"><div class="day-number">11<div class="day-location">Beruwala</div></div><div><div class="day-title">Coastal Paradise</div><div class="day-details">Journey to Beruwala beach resort. Check-in at Cinnamon Bey. Swim in warm turquoise waters. Lounge under swaying palm trees. Optional snorkeling and diving. Sunset seafood dinner. Begin coastal relaxation phase.</div><div class="day-highlights"><span class="day-highlight">Beach relaxation</span><span class="day-highlight">Swimming</span><span class="day-highlight">Sunset seafood dinner</span></div><div class="day-hotel">🏨 Cinnamon Bey (HB)</div></div></div>
+
+  <div class="day-card"><div class="day-number">12<div class="day-location">Beruwala</div></div><div><div class="day-title">Turtles, River & Gardens</div><div class="day-details">Turtle Hatchery visit — 5 sea turtle species conservation. Baby turtle release. Madu River boat safari through mangrove tunnels. Island temples. Cinnamon peeling demonstration. Brief Garden (Bawa) — tropical landscape architecture.</div><div class="day-highlights"><span class="day-highlight">Turtle Hatchery</span><span class="day-highlight">Madu River safari</span><span class="day-highlight">Brief Garden</span></div><div class="day-hotel">🏨 Cinnamon Bey (HB)</div></div></div>
+
+  <div class="day-card"><div class="day-number">13<div class="day-location">Colombo</div></div><div><div class="day-title">Colonial Heritage & Urban Vibrancy</div><div class="day-details">Colombo city tour — Independence Square, Gangaramaya Temple, Pettah Bazaar, Fort district colonial architecture. Galle Face Green sunset. Modern shopping at Colombo City Centre. Street food and local dining.</div><div class="day-highlights"><span class="day-highlight">Colombo city tour</span><span class="day-highlight">Pettah Bazaar</span><span class="day-highlight">Galle Face Green</span></div><div class="day-hotel">🏨 OZO Colombo (HB)</div></div></div>
+
+  <div class="day-card"><div class="day-number">14<div class="day-location">Departure</div></div><div><div class="day-title">Farewell to Paradise</div><div class="day-details">Breakfast and check-out. Airport transfer with assistance. Departure procedures support. End of an unforgettable 14-day journey. Ayubowan — may you have a long life!</div><div class="day-highlights"><span class="day-highlight">Airport transfer</span><span class="day-highlight">Departure assistance</span></div><div class="day-hotel">🥐 Breakfast only</div></div></div>
+</section>
+
+<!-- Pricing -->
+<section>
+  <h2>💰 2026 Pricing</h2>
+  <p style="color:#888;font-size:14px;margin-bottom:20px">All prices in USD — per person sharing a double room on Half Board (breakfast + dinner) basis. Valid until December 31, 2026.</p>
+  <div class="pricing-grid">
+    <div class="pricing-card featured"><div class="group">2</div><div class="per">travelers</div><div class="price">$2,490</div><div class="note">per person</div></div>
+    <div class="pricing-card"><div class="group">4</div><div class="per">travelers</div><div class="price">$2,190</div><div class="note">per person</div></div>
+    <div class="pricing-card"><div class="group">6</div><div class="per">travelers</div><div class="price">$2,090</div><div class="note">per person</div></div>
+    <div class="pricing-card"><div class="group">10</div><div class="per">travelers</div><div class="price">$1,990</div><div class="note">per person</div></div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px">
+    <div class="pricing-card"><div style="font-size:14px;color:#888">Single Supplement</div><div style="font-size:20px;font-weight:600;color:#e94560">$1,590</div></div>
+    <div class="pricing-card"><div style="font-size:14px;color:#888">Child with Bed</div><div style="font-size:20px;font-weight:600;color:#e94560">$890</div></div>
+    <div class="pricing-card"><div style="font-size:14px;color:#888">Child No Bed</div><div style="font-size:20px;font-weight:600;color:#e94560">$550</div></div>
+    <div class="pricing-card"><div style="font-size:14px;color:#888">Triple Reduction</div><div style="font-size:20px;font-weight:600;color:#e94560">-$190</div></div>
+  </div>
+</section>
+
+<!-- Inclusions -->
+<section>
+  <h2>✅ Inclusions & Exclusions</h2>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:30px">
+    <div>
+      <h3 style="color:#4ade80">Included</h3>
+      <div class="inc-grid">
+        <div class="inc-item"><span class="icon">✓</span> 13 nights premium accommodation (HB)</div>
+        <div class="inc-item"><span class="icon">✓</span> Air-conditioned private vehicle</div>
+        <div class="inc-item"><span class="icon">✓</span> English-speaking chauffeur guide</div>
+        <div class="inc-item"><span class="icon">✓</span> All airport transfers</div>
+        <div class="inc-item"><span class="icon">✓</span> City tours as per itinerary</div>
+        <div class="inc-item"><span class="icon">✓</span> Mineral water (500ml x2 pp/day)</div>
+        <div class="inc-item"><span class="icon">✓</span> All applicable taxes</div>
+        <div class="inc-item"><span class="icon">✓</span> 24/7 AI concierge support</div>
+      </div>
+    </div>
+    <div>
+      <h3 style="color:#e94560">Excluded</h3>
+      <div class="ex-item">✗ Monument / national park entrance fees</div>
+      <div class="ex-item">✗ Safari jeep charges (~$18/person)</div>
+      <div class="ex-item">✗ Alcoholic beverages</div>
+      <div class="ex-item">✗ Personal expenses (laundry, tips, phone)</div>
+      <div class="ex-item">✗ Visa fees (ETA — apply at www.eta.gov.lk)</div>
+      <div class="ex-item">✗ Travel insurance</div>
+    </div>
+  </div>
+</section>
+
+<!-- Wellness Module -->
+<section>
+  <h2>🌿 Ayurveda & Wellness Add-on</h2>
+  <p style="color:#888;font-size:14px;margin-bottom:20px">Add a personalized wellness protocol to any tour. Designed in partnership with BIMARI Naviina — Sri Lanka's premier Ayurveda institution.</p>
+  <div class="wellness-showcase">
+    <div class="wellness-item"><h4>Abhyanga (Oil Massage)</h4><p>3 sessions — $180. Full-body warm oil massage. Deep relaxation, improved circulation.</p></div>
+    <div class="wellness-item"><h4>Shirodhara</h4><p>2 sessions — $160. Warm oil gently poured on forehead. Stress relief, mental clarity.</p></div>
+    <div class="wellness-item"><h4>Yoga & Meditation</h4><p>5 sessions — $150. Daily morning practice with certified instructor. All levels welcome.</p></div>
+    <div class="wellness-item"><h4>Herbal Steam Bath</h4><p>3 sessions — $90. Medicated steam with Ayurvedic herbs. Detox, muscle recovery.</p></div>
+  </div>
+  <p style="text-align:center;margin-top:16px;font-size:13px;color:#888">Complete wellness package: <strong style="color:#e94560">$580/person</strong> — includes health intake consultation with BIMARI doctor</p>
+</section>
+
+<!-- Hotels -->
+<section>
+  <h2>🏨 Accommodation</h2>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px">
+    <div class="day-card"><div><div style="font-size:13px;color:#666">Night 1</div><div class="day-title">Arie Lagoon</div><div class="day-details">Negombo — 4-star beachfront</div></div></div>
+    <div class="day-card"><div><div style="font-size:13px;color:#666">Night 2</div><div class="day-title">Alakamanda Hotel</div><div class="day-details">Anuradhapura — 4-star city hotel</div></div></div>
+    <div class="day-card"><div><div style="font-size:13px;color:#666">Nights 3-4</div><div class="day-title">Cinnamon Village</div><div class="day-details">Habarana — 4-star resort, Cinnamon chain</div></div></div>
+    <div class="day-card"><div><div style="font-size:13px;color:#666">Nights 5-6</div><div class="day-title">Cinnamon Citadel</div><div class="day-details">Kandy — 4-star lakeside resort</div></div></div>
+    <div class="day-card"><div><div style="font-size:13px;color:#666">Nights 7-8</div><div class="day-title">EKHO Ella</div><div class="day-details">Ella — 4-star mountain retreat</div></div></div>
+    <div class="day-card"><div><div style="font-size:13px;color:#666">Nights 9-10</div><div class="day-title">Cinnamon Wild</div><div class="day-details">Yala — 4-star wildlife lodge</div></div></div>
+    <div class="day-card"><div><div style="font-size:13px;color:#666">Nights 11-12</div><div class="day-title">Cinnamon Bey</div><div class="day-details">Beruwala — 5-star beach resort</div></div></div>
+    <div class="day-card"><div><div style="font-size:13px;color:#666">Night 13</div><div class="day-title">OZO Colombo</div><div class="day-details">Colombo — 4-star city hotel</div></div></div>
+  </div>
+</section>
+
+<!-- WhatsApp CTA -->
+<div class="cta-section">
+  <h2>📱 Book Now via WhatsApp</h2>
+  <p>Scan or click to chat with our AI concierge. Instant itinerary, instant quote, instant booking.</p>
+  <a class="cta-button" href="https://wa.me/94771234567">Chat on WhatsApp</a>
+  <div class="cta-note">🇱🇰 +94 77 123 4567 • 24/7 • 12 languages</div>
+</div>
+
+<!-- Footer -->
+<footer>
+  <div class="name">Ceylonia Holidays</div>
+  <div class="contact">
+    <span>📧 hello@ceyloniaholidays.com</span>
+    <span>📱 +94 77 123 4567</span>
+  </div>
+  <div style="margin-top:16px;font-size:11px;color:#444">
+    <p>Glimpses of Ceylon — 14 Days / 13 Nights</p>
+    <p>All prices in USD. Valid until 31 Dec 2026. Subject to availability.</p>
+    <p style="margin-top:8px">© 2026 Ceylonia Holidays. All rights reserved.</p>
+  </div>
+</footer>
+
+</div>
+</body>
+</html>
