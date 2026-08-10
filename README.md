@@ -1,5 +1,7 @@
 # LankaAgent — AI Travel Concierge for Sri Lanka Tour Operators
 
+> **⚡ North Star: REVENUE.** Every feature must pass the Revenue Filter (DEC-20260810-001) — it must add money or unblock a money-earning step. **No vanity features.** See [REVENUE-PLAN.md](REVENUE-PLAN.md) (all streams, costs, projections, targets) + [SPEC.md](SPEC.md) + [decisions/DECISION-LOG.md](decisions/DECISION-LOG.md).
+
 [![CI](https://github.com/nispri/lankaagent/workflows/CI/badge.svg)](https://github.com/nispri/lankaagent/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
@@ -215,6 +217,28 @@ docker compose exec api pytest --cov=app --cov-report=html
 > **Note:** after any `docker compose` recreate, tests dir is wiped — re-copy:
 > `docker cp C:/Users/nishanthap/lankaagent/tests lankaagent-api:/app/tests`
 > Current suite: **14 passed, 1 xfailed** (9 API + 5 pricing; the xfail is a known async SQLAlchemy cleanup).
+
+---
+
+## 💰 Money & Revenue (Owner's Guide)
+
+**The project exists to earn money — every feature must pass the Revenue Filter** (see [REVENUE-PLAN.md](REVENUE-PLAN.md), the authoritative money document).
+
+| Stream | Model | Price |
+|--------|-------|-------|
+| SaaS Subscription | Monthly | Starter $49 · Pro $199 · Enterprise $499 |
+| Wellness Add-on | Monthly | +$199/mo |
+| Transaction Fee | Per booking | 2.9% Stripe / 3.5% PayHere |
+| Wellness Split | Per wellness booking | 15% platform / 85% doctor |
+| White-label + API | Enterprise only | In $499 tier |
+| Setup / Onboarding | One-time | $99 (proposed) |
+| Referral Program | Per referred operator | $100 credit + 10% rev share |
+| Ceyloria own tours (pilot #1) | Direct sales | $2,490/pp · 25.95% margin |
+| Group departures | Per departure | 6 pax ≈ $14,940 |
+
+**Year 1 (conservative):** ~$291K revenue · <$1K cost · **~$290K profit (99.7% margin)** → $70K MRR / $840K ARR by M12. Stretch: $100K+ MRR.
+**Cost rule:** free tiers first (Zen LLM, Vercel, ngrok); never exceed 2% of MRR in spend.
+**Milestones:** first booking this week → 3 pilots / $3K MRR by M2 → payments live M5-6 → $38K M9 → $70K M12.
 
 ---
 

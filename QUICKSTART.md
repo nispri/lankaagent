@@ -1,5 +1,7 @@
 # LankaAgent - Quick Start Guide for New Session
 
+> **⚡ REVENUE-FIRST:** this project earns money. See [REVENUE-PLAN.md](REVENUE-PLAN.md) for the full money model (9 streams, costs, projections, targets) — every feature must pass the Revenue Filter (DEC-20260810-001). **Money-linked milestones:** first booking this week → 3 pilots / $3K MRR by M2 → $70K MRR by M12.
+
 ## 🚀 Quick Start (5 minutes)
 
 ### 1. Start Services
