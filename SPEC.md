@@ -5,7 +5,7 @@
 **Owner:** Hermes (Chief of Staff)  
 **Review Cycle:** Sprint 0 → Sprint 1 refinement
 
-> **⚡ North Star: REVENUE.** Every feature must pass the Revenue Filter (DEC-20260810-001): it must help us earn money by adding value — subscription tier value, transaction fees, wellness split, or a documented GTM step. **No vanity features.** See `decisions/DECISION-LOG.md`.
+> **⚡ North Star: REVENUE.** Every feature must pass the Revenue Filter (DEC-20260810-001): it must help us earn money by adding value — subscription tier value, transaction fees, wellness split, or a documented GTM step. **No vanity features.** See `decisions/DECISION-LOG.md`. Full money model: **`REVENUE-PLAN.md`** (all streams, costs, projections, targets).
 
 ---
 
