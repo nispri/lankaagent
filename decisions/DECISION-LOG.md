@@ -15,6 +15,7 @@
 | DEC-20250721-003 | 2025-07-21 | Sprint 0 Plan & Timeline | ⏳ Pending Review | — |
 | DEC-20250721-004 | 2025-07-21 | Pricing & Packaging (SPEC Section 6) | ⏳ Pending Review | — |
 | DEC-20250721-005 | 2025-07-21 | Tech Stack Confirmation (FastAPI, LangGraph, Postgres, Redis) | ⏳ Pending Review | — |
+| DEC-20260810-001 | 2026-08-10 | **Revenue-First Principle (every feature must add $ value)** | ✅ Approved | Approved as-written |
 
 ---
 
@@ -182,3 +183,39 @@ Confirm stack → Hermes documents in `ARCHITECTURE.md` → Sprint 0 Day 1 uses 
 
 **Signed:** _________________________  **Date:** _______________
 ```
+
+---
+
+## DEC-20260810-001: Revenue-First Principle
+
+**Status:** APPROVED
+**Date:** 2026-08-10
+**Chairman:** Nishantha Priyadarshana
+**Filed by:** Hermes (Chief of Staff)
+
+### Summary
+The project's **North Star is revenue** — earning money from LankaAgent, step by step as written in SPEC Section 6 (Pricing and Packaging) and Section 8 (Go-to-Market). Every feature, fix, or investment must be judged by one question: **"Does this help us earn more money by adding value to the project?"**
+
+### The Rule (binding for all future work)
+1. **Every new feature must pass the Revenue Filter:** it must map to a revenue line item — subscription tier value, transaction fee, wellness split, or a documented GTM step (pilot acquisition, booking, retention).
+2. **No vanity features.** If a feature cannot be tied to earning money or unblocking a money-earning step, it is **out of scope** unless the Chairman explicitly approves it.
+3. **Value-first framing:** features must add value for the operator (their guest books more, their ops save time) — value for them = willingness to pay = revenue for us.
+4. **Document the "why":** any new scope proposal must state its revenue impact in the decision log before work begins.
+5. **Deviations are logged:** technical deviations from SPEC are allowed only if they accelerate revenue (e.g., direct LLM concierge instead of LangGraph to reach pilot-revenue faster — already logged in SPEC Section 7).
+
+### Revenue anchors (from SPEC Section 6)
+- Starter $49/mo, Professional $199/mo, Enterprise $499/mo, Wellness +$199/mo
+- Transaction fees: Stripe 2.9%+$0.30, PayHere 3.5%+LKR10, Wellness split 15%
+- Year 1 target: **$70K MRR / $840K ARR** with 80 operators
+- First milestone: **3 pilots to $3K MRR by Month 2 — first booking from pilot Priya (Ceyloria)**
+
+### Examples of filter application
+- IN: Custom tour pricing engine — operator can sell custom itineraries — books more — revenue
+- IN: Voice widget — guest converts more easily — bookings — revenue
+- IN: Wellness add-on — 15% split revenue stream
+- OUT (without Chairman approval): features that are nice for demo but nobody pays for — internal dashboards for fun, re-architectures without revenue impact, gold-plating
+
+### Next Actions
+- [x] Revenue-First Principle logged as binding decision
+- [ ] Hermes applies the Revenue Filter to all future proposals (default behavior)
+- [ ] Weekly sync: revenue metrics reviewed first (bookings, pipeline, MRR)
