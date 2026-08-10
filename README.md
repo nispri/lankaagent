@@ -48,6 +48,8 @@ Operator Dashboard: Lead → Quote → Booking → Calendar (auto-synced)
 |---------|-------------|
 | **24/7 WhatsApp AI Agent** | Replies in 12 languages (EN/SI/TA/RU/DE/ZH/FR/AR/JA/KO/IT/ES) |
 | **Instant Itinerary Builder** | MCP-powered: real SL attractions, seasonal pricing, transport options |
+| **Custom Tour Pricing** | Quotes 5/7/10/14-day itineraries with exact USD from real hotel rates |
+| **Voice Chat (Anuki speaks)** | Edge neural TTS + Whisper STT — mic input and spoken replies in any browser |
 | **Multi-Currency Payments** | Stripe (USD/EUR/GBP) + PayHere (LKR) + Bank Transfer fallback |
 | **Operator Dashboard** | Leads, Conversations, Itineraries, Bookings, Calendar, Analytics |
 | **Wellness/Ayurveda Engine** | Health intake → Protocol match → BIMARI doctor assign → Post-care |
@@ -135,7 +137,8 @@ Copy `.env.example` to `.env` and fill in:
 | `TWILIO_ACCOUNT_SID` / `AUTH_TOKEN` | [Twilio Console](https://console.twilio.com) | WhatsApp Sandbox / Production |
 | `STRIPE_SECRET_KEY` | [Stripe Dashboard](https://dashboard.stripe.com/apikeys) | International payments |
 | `PAYHERE_MERCHANT_ID` / `SECRET` | [PayHere Settings](https://www.payhere.lk/merchant/settings) | LKR payments |
-| `OPENROUTER_API_KEY` | [OpenRouter](https://openrouter.ai/keys) | LLM access (Nemotron, Claude, GPT-4o) |
+| `ZEN_API_KEY` | [OpenCode Zen](https://opencode.ai/auth) | **Primary LLM** (deepseek-v4-flash-free, free) |
+| `OPENROUTER_API_KEY` | [OpenRouter](https://openrouter.ai/keys) | LLM fallback provider |
 | `GOOGLE_CALENDAR_CLIENT_ID/SECRET` | [Google Cloud Console](https://console.cloud.google.com/apis/credentials) | Calendar sync |
 | `POSTHOG_API_KEY` | [PostHog](https://app.posthog.com/project/settings) | Analytics |
 | `SENTRY_DSN` | [Sentry](https://sentry.io/settings/projects/) | Error tracking |
@@ -196,8 +199,8 @@ lankaagent/
 ## 🧪 Testing
 
 ```bash
-# All tests
-make test
+# All tests (API + pricing engine)
+docker exec lankaagent-api python -m pytest tests/test_api.py tests/test_tour_pricing.py -v
 
 # Unit only (fast)
 make test-unit
@@ -208,6 +211,10 @@ make test-integration
 # Coverage report
 docker compose exec api pytest --cov=app --cov-report=html
 ```
+
+> **Note:** after any `docker compose` recreate, tests dir is wiped — re-copy:
+> `docker cp C:/Users/nishanthap/lankaagent/tests lankaagent-api:/app/tests`
+> Current suite: **14 passed, 1 xfailed** (9 API + 5 pricing; the xfail is a known async SQLAlchemy cleanup).
 
 ---
 
@@ -294,7 +301,8 @@ Proprietary — All Rights Reserved.
 
 - **SLTDA** for tourism statistics and operator registry
 - **BIMARI Naviina** for Ayurveda/wellness medical network
-- **OpenRouter** for unified LLM access
+- **OpenCode Zen** for primary free LLM access (deepseek-v4-flash-free)
+- **OpenRouter** for fallback LLM access
 - **LangGraph** for production-grade agent orchestration
 - **FastMCP** for elegant MCP server framework
 

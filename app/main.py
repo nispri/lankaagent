@@ -21,6 +21,8 @@ from app.core.middleware import (
     TenantMiddleware,
 )
 from app.core.redis import redis_client
+from app.integrations.chat_widget.router import router as chat_widget_router
+from app.integrations.whatsapp import router as whatsapp_router
 
 # Configure structured logging
 structlog.configure(
@@ -143,6 +145,12 @@ def create_app() -> FastAPI:
 
     # API Router
     app.include_router(api_router, prefix="/api/v1")
+
+    # Webhook endpoints (no auth)
+    app.include_router(whatsapp_router, prefix="/webhook", tags=["Webhooks"])
+
+    # Chat widget embed
+    app.include_router(chat_widget_router, prefix="/widget", tags=["Chat Widget"])
 
     # Root endpoint
     @app.get("/", tags=["Root"])

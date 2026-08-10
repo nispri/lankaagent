@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ceyloria Holidays — Glimpses of Ceylon</title>
+    <meta name="description" content="Premium 14-day Sri Lanka tours. Cultural triangle, wildlife safaris, tea country, and golden beaches. AI-powered booking with 24/7 multilingual support.">
+    <meta property="og:title" content="Ceyloria Holidays — Glimpses of Ceylon">
+    <meta property="og:description" content="Premium 14-day Sri Lanka tours. Cultural triangle, wildlife safaris, tea country, and golden beaches.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://ceyloriaholidays.com">
+    <meta property="og:image" content="https://cycling-handwash-oversweet.ngrok-free.dev/og-image.jpg">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Ceyloria Holidays — Glimpses of Ceylon">
+    <meta name="twitter:description" content="Premium 14-day Sri Lanka tours. Cultural triangle, wildlife safaris, tea country, and golden beaches.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #e94560;
+            --primary-dark: #c73650;
+            --dark: #0f172a;
+            --dark-light: #1e293b;
+            --light: #f8fafc;
+            --muted: #94a3b8;
+            --white: #ffffff;
+            --gold: #d4a843;
+        }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--white);
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        h1, h2, h3, h4 { font-family: 'Playfair Display', serif; color: var(--dark); }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            padding: 14px 28px; border-radius: 50px; font-weight: 600; font-size: 16px;
+            text-decoration: none; transition: all 0.2s ease; border: none; cursor: pointer;
+        }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(233, 69, 96, 0.4); }
+        .btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
+        .btn-outline:hover { background: var(--primary); color: white; }
+        .section { padding: 100px 0; }
+        .section-alt { background: var(--light); }
+        .section-dark { background: var(--dark); color: white; }
+        .section-title { font-size: 40px; font-weight: 700; text-align: center; margin-bottom: 16px; }
+        .section-subtitle { font-size: 18px; color: var(--muted); text-align: center; max-width: 600px; margin: 0 auto 60px; }
+        .gold-accent { color: var(--gold); }
+        
+        /* Hero */
+        .hero {
+            min-height: 100vh;
+            display: flex; align-items: center; justify-content: center;
+            background: linear-gradient(135deg, var(--dark) 0%, #1e293b 50%, #0f172a 100%);
+            position: relative; overflow: hidden;
+        }
+        .hero::before {
+            content: ''; position: absolute; inset: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;
+            opacity: 0.15;
+        }
+        .hero-content { position: relative; z-index: 1; text-align: center; max-width: 900px; padding: 0 24px; }
+        .hero-badge { display: inline-block; background: rgba(233, 69, 96, 0.2); color: #e94560; padding: 8px 24px; border-radius: 50px; font-size: 14px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 24px; }
+        .hero h1 { font-size: clamp(40px, 6vw, 72px); font-weight: 700; line-height: 1.1; margin-bottom: 24px; color: white; }
+        .hero .gold { color: #d4a843; }
+        .hero p { font-size: clamp(18px, 2.5vw, 22px); color: rgba(255,255,255,0.8); max-width: 600px; margin: 0 auto 32px; }
+        .hero-buttons { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-top: 32px; }
+        
+        /* Stats Bar */
+        .stats-bar { background: rgba(255,255,255,0.03); border-top: 1px solid rgba(255,255,255,0.08); border-bottom: 1px solid rgba(255,255,255,0.08); padding: 48px 0; margin-top: 80px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+        .stat-item { text-align: center; }
+        .stat-number { font-size: 48px; font-weight: 700; font-family: 'Playfair Display', serif; color: #d4a843; line-height: 1; }
+        .stat-label { font-size: 14px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 8px; }
+        
+        /* Itinerary Highlights */
+        .highlights { background: var(--white); }
+        .highlights-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin-top: 60px; }
+        .highlight-card { background: var(--white); border: 1px solid rgba(0,0,0,0.06); border-radius: 20px; overflow: hidden; transition: transform 0.3s, box-shadow 0.3s; }
+        .highlight-card:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
+        .card-image { aspect-ratio: 16/10; background: linear-gradient(135deg, var(--primary) 0%, var(--gold) 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 48px; }
+        .card-content { padding: 24px; }
+        .card-tag { display: inline-block; background: #e94560; color: white; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
+        .card-title { font-size: 22px; font-weight: 600; margin-bottom: 8px; color: var(--dark); }
+        .card-text { color: var(--muted); font-size: 15px; line-height: 1.6; margin-bottom: 16px; }
+        .card-price { font-size: 18px; font-weight: 700; color: var(--primary); }
+        
+        /* Testimonials */
+        .testimonials { background: var(--dark); color: white; }
+        .testimonials-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin-top: 60px; }
+        .testimonial-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; padding: 32px; position: relative; }
+        .testimonial-card::before { content: '"'; font-size: 80px; color: var(--gold); opacity: 0.3; position: absolute; top: 16px; left: 24px; font-family: 'Playfair Display', serif; line-height: 1; }
+        .testimonial-text { font-size: 16px; line-height: 1.7; color: rgba(255,255,255,0.9); margin-bottom: 20px; position: relative; z-index: 1; }
+        .testimonial-author { display: flex; align-items: center; gap: 12px; }
+        .author-avatar { width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--gold)); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 18px; }
+        .author-name { font-weight: 600; color: white; }
+        .author-location { font-size: 13px; color: var(--muted); }
+        
+        /* CTA Section */
+        .cta-section { background: linear-gradient(135deg, var(--primary) 0%, #c73650 100%); }
+        .cta-content { text-align: center; max-width: 700px; margin: 0 auto; }
+        .cta-section h2 { font-size: clamp(32px, 5vw, 48px); color: white; margin-bottom: 16px; }
+        .cta-section p { font-size: 18px; color: rgba(255,255,255,0.9); margin-bottom: 32px; max-width: 500px; margin-left: auto; margin-right: auto; }
+        
+        /* Footer */
+        footer { background: var(--dark); color: white; padding: 60px 0 24px; }
+        .footer-grid { display: grid; grid-template-columns: 2fr repeat(3, 1fr); gap: 48px; margin-bottom: 48px; }
+        .footer-brand .logo { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: white; margin-bottom: 16px; }
+        .footer-brand p { color: var(--muted); max-width: 280px; line-height: 1.7; }
+        .social-links { display: flex; gap: 12px; margin-top: 16px; }
+        .social-links a { width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; color: white; transition: all 0.2s; }
+        .social-links a:hover { background: var(--primary); transform: translateY(-2px); }
+        .footer-column h4 { font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--gold); margin-bottom: 20px; }
+        .footer-column ul { list-style: none; }
+        .footer-column li { margin-bottom: 12px; }
+        .footer-column a { color: rgba(255,255,255,0.7); text-decoration: none; font-size: 14px; transition: color 0.2s; }
+        .footer-column a:hover { color: var(--gold); }
+        .footer-bottom { border-top: 1px solid rgba(255,255,255,0.08); padding-top: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; font-size: 13px; color: var(--muted); }
+        .footer-bottom a { color: var(--muted); text-decoration: none; }
+        .footer-bottom a:hover { color: var(--gold); }
+        
+        /* Chat Widget Trigger - Fixed */
+        .chat-trigger {
+            position: fixed; bottom: 24px; right: 24px; z-index: 9999;
+            width: 64px; height: 64px; border-radius: 50%;
+            background: #e94560; border: none; cursor: pointer;
+            box-shadow: 0 4px 24px rgba(233, 69, 96, 0.4);
+            display: flex; align-items: center; justify-content: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .chat-trigger:hover { transform: scale(1.05); box-shadow: 0 8px 32px rgba(233, 69, 96, 0.5); }
+        .chat-trigger svg { width: 28px; height: 28px; color: white; }
+        
+        /* Mobile */
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 36px; }
+            .section { padding: 60px 0; }
+            .section-title { font-size: 30px; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+            .stat-number { font-size: 36px; }
+            .hero-buttons { flex-direction: column; align-items: center; }
+            .hero-buttons .btn { width: 100%; max-width: 280px; }
+            .footer-grid { grid-template-columns: 1fr; gap: 32px; text-align: center; }
+            .footer-brand { max-width: 100%; }
+            .social-links { justify-content: center; }
+            .footer-bottom { flex-direction: column; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav style="position: fixed; top: 0; left: 0; right: 0; z-index: 1000; background: rgba(255,255,255,0.95); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(0,0,0,0.06);">
+        <div class="container" style="display: flex; align-items: center; justify-content: space-between; height: 72px;">
+            <a href="/" class="logo" style="font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; color: #0f172a; text-decoration: none;">Ceyloria<span class="gold-accent">Holidays</span></a>
+            <div style="display: flex; align-items: center; gap: 32px;">
+                <nav style="display: flex; gap: 32px;">
+                    <a href="#journey" style="color: #334155; text-decoration: none; font-weight: 500; font-size: 14px; transition: color 0.2s;">Journey</a>
+                    <a href="#experiences" style="color: #334155; text-decoration: none; font-weight: 500; font-size: 14px; transition: color 0.2s;">Experiences</a>
+                    <a href="#testimonials" style="color: #334155; text-decoration: none; font-weight: 500; font-size: 14px; transition: color 0.2s;">Reviews</a>
+                    <a href="#contact" style="color: #334155; text-decoration: none; font-weight: 500; font-size: 14px; transition: color 0.2s;">Contact</a>
+                </nav>
+                <a href="#contact" class="btn btn-primary" style="padding: 10px 24px; font-size: 14px;">Start Planning</a>
+            </div>
+        </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-content">
+            <span class="hero-badge">🇱🇰 Sri Lanka's Premier Tour Operator</span>
+            <h1>Glimpses of <span class="gold">Ceylon</span><br>A 14-Day Journey Through Paradise</h1>
+            <p>From ancient kingdoms to misty tea hills, leopard safaris to golden beaches. Experience Sri Lanka's soul with Ceyloria Holidays — where every detail is crafted with care.</h1>
+            <div class="hero-buttons">
+                <a href="#journey" class="btn btn-primary">View Full Itinerary</a>
+                <a href="#contact" class="btn btn-outline" style="border-color: white; color: white;">Start Planning</a>
+            </div>
+        </div>
+        <div class="stats-bar">
+            <div class="container stats-grid">
+                <div class="stat-item">
+                    <div class="stat-number">14</div>
+                    <div class="stat-label">Days of Discovery</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">8</div>
+                    <div class="stat-label">UNESCO Heritage Sites</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">2,490</div>
+                    <div class="stat-label">Per Person (2 Pax)</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">4.9</div>
+                    <div class="stat-label">Guest Rating</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Journey Overview -->
+    <section class="section" id="journey">
+        <div class="container">
+            <h2 class="section-title">Your <span class="gold-accent">Journey</span> at a Glance</h2>
+            <p class="section-subtitle">14 days. 8 UNESCO sites. One unforgettable story.</p>
+            
+            <div class="highlights-grid" id="journey-cards">
+                <!-- Cards generated by JS -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Experiences -->
+    <section class="section section-alt" id="experiences">
+        <div class="container">
+            <h2 class="section-title">Curated <span class="gold-accent">Experiences</span></h2>
+            <p class="section-subtitle">Beyond the itinerary — moments that become memories</p>
+            <div class="highlights-grid">
+                <div class="highlight-card">
+                    <div class="card-image">☕</div>
+                    <div class="card-content">
+                        <span class="card-tag">Tea Country</span>
+                        <h3 class="card-title">Ceylon Tea Experience</h3>
+                        <p class="card-text">Visit a working tea factory, pluck leaves with expert pickers, and savor a tasting session overlooking emerald hills.</                    </p>
+                </div>
+                </div>
+                <div class="highlight-card">
+                    <div class="card-image">🐆</div>
+                    <div class="card-content">
+                        <span class="card-tag">Wildlife</span>
+                        <h3 class="card-title">Yala Leopard Safari</h3>
+                        <p class="card-text">Full-day private safari in Yala National Park — highest leopard density on Earth. Spot elephants, sloth bears, and 200+ bird species.</                    </p>
+                </div>
+                </div>
+                <div class="highlight-card">
+                    <div class="card-image">🏛️</div>
+                    <div class="card-content">
+                        <span class="card-tag">Heritage</span>
+                        <h3 class="card-title">Ancient Kingdoms</h3>
+                        <p class="card-text">Explore Anuradhapura & Polonnaruwa with an archaeologist guide. Climb Sigiriya at sunrise — the 8th Wonder of the World.
+                    </p>
+                </div>
+                </div>
+                <div class="highlight-card">
+                    <div class="card-image">🧘</div>
+                    <div class="card-content">
+                        <span class="card-tag">Wellness</span>
+                        <h3 class="card-title">Ayurveda & Wellness</h3>
+                        <p class="card-text">Personalized Ayurveda programs at BIMARI-certified centers. Abhyanga, Shirodhara, yoga & meditation in tranquil settings.
+                    </p>
+                </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="section section-dark" id="testimonials">
+        <div class="container">
+            <h2 class="section-title">Travelers <span class="gold-accent">Love Us</span></h2>
+            <p class="section-subtitle">Real stories from real journeys</p>
+            <div class="testimonials-grid">
+                <div class="testimonial-card">
+                    <p class="testimonial-text">"The most seamless travel experience we've ever had. Every detail — from the private driver to the surprise candlelit dinner in Ella — was perfect. Ceyloria doesn't just book trips; they craft memories."</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">SJ</div>
+                        <div><div class="author-name">Sarah & James</div><div class="author-location">London, UK • March 2024</div></div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <p class="testimonial-text">"The Ayurveda program at the end of our tour was life-changing. After two weeks of adventure, the personalized treatments at the BIMARI center reset my body and mind. Worth every penny."</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">MK</div>
+                        <div><div class="author-name">Meera K.</div><div class="author-location">Singapore • February 2024</div></div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <p class="testimonial-text">"We traveled with our teenagers (14 & 16) and they were engaged every day — from the leopard safari to the cooking class in a village home. Ceyloria understands family travel."</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">RC</div>
+                        <div><div class="author-name">The Chen Family</div><div class="author-location">Sydney, Australia • December 2023</div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing -->
+    <section class="section" id="pricing">
+        <div class="container">
+            <h2 class="section-title">Transparent <span class="gold-accent">Pricing</span></h2>
+            <p class="section-subtitle">All-inclusive. No hidden fees. Best value guaranteed.</            <div class="pricing-grid">
+                <div class="pricing-card">
+                    <div class="group">2 Travelers</div>
+                    <div class="price"><span class="amount">$2,490</span><span class="per">/person</span></div>
+                    <ul style="list-style:none; padding:0; margin:24px 0;">
+                        <li style="margin:12px 0; color:#64748b;">✓ 13 nights premium accommodation</li>
+                        <li style="margin:12px 0; color:#64748b;">✓ All meals (Breakfast + Dinner)</li>
+                        <li style="margin:12px 0; color:#64748b;">✓ Private AC vehicle + driver</li>
+                        <li style="margin:12px 0; color:#64748b;">✓ English-speaking guide</li>
+                        <li style="margin:12px 0; color:#64748b;">✓ All entrance fees</li>
+                        <li style="margin:12px 0; color:#64748b;">✓ 24/7 concierge support</li>
+                    </ul>
+                </div>
+                <div class="pricing-card featured">
+                    <div class="group">4 Travelers</div>
+                    <div class="price"><span class="amount">$2,190</span><span class="per">/person</span></div>
+                    <ul style="list-style:none; padding:0; margin:24px 0;">
+                        <li style="margin:12px 0; color:#64748b;">✓ Everything in 2-person package</li>
+                        <li style="margin:12px 0; color:#64748b;">✓ Larger vehicle (van/SUV)</li>
+                        <li style="margin:12px 0; color:#64748b;">✓ Group discounts on activities</li>
+                    </ul>
+                </div>
+                <div class="pricing-card">
+                    <div class="group">6+ Travelers</div>
+                    <div class="price"><span class="amount">$2,090</span><span class="per">/person</span></div>
+                    <ul style="list-style:none; padding:0; margin:24px 0;">
+                        <li style="margin:12px 0; color:#64748b;">✓ Everything in 4-person package</li>
+                        <li style="margin:12px 0; color:#64748b;">✓ Dedicated tour manager</li>
+                        <li style="margin:12px 0; color:#64748b;">✓ Customizable itinerary</li>
+                        <li style="margin:12px 0; color:#64748b;">✓ Complimentary room upgrade</li>
+                    </ul>
+                </div>
+            </div>
+            <p style="text-align:center; margin-top:24px; color:#64748b; font-size:14px;">
+                Single supplement: $1,235 | Child (with extra bed): $890 | Child (no bed): $590<br>
+                Prices valid until Dec 31, 2026. <a href="#contact" style="color:#e94560; font-weight:600;">Request custom quote →</a>
+            </p>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta-section" id="contact">
+        <div class="container cta-content">
+            <h2>Ready for Your <span class="gold">Ceylon Adventure</span>?</h2>
+            <p>Let's design your perfect Sri Lanka journey. Our travel designers will craft a personalized proposal within 24 hours — no obligation.</            <div class="hero-buttons" style="margin-top:32px;">
+                <a href="https://wa.me/94771234567?text=Hi%20Ceyloria%2C%20I%27d%20like%20to%20plan%20my%20Sri%20Lanka%20trip" class="btn btn-primary" style="background: #25D366; border-color: #25D366;">Chat on WhatsApp</a>
+                <a href="mailto:hello@ceyloriaholidays.com" class="btn btn-outline" style="border-color: white; color: white;">Email Us</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <div class="logo">Ceyloria<span class="gold-accent">Holidays</span></div>
+                    <p>Crafting unforgettable Sri Lanka journeys since 2024. Licensed by SLTDA. Member of PATA & SLAITO.</                    <div class="social-links">
+                        <a href="#" aria-label="Instagram"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg></a>
+                        <a href="#" aria-label="Facebook"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg></a>
+                        <a href="#" aria-label="LinkedIn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v7"></path></svg></a>
+                    </div>
+                </div>
+                <div>
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="#journey">Our Journey</a></li>
+                        <li><a href="#experiences">Experiences</a></li>
+                        <li><a href="#testimonials">Reviews</a></li>
+                        <li><a href="#pricing">Pricing</a></li>
+                        <li><a href="#contact">Contact Us</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4>Destinations</h4>
+                    <ul>
+                        <li><a href="#">Cultural Triangle</a></li>
+                        <li><a href="#">Tea Country</a></li>
+                        <li><a href="#">Wildlife Safaris</a></li>
+                        <li><a href="#">South Coast</a></li>
+                        <li><a href="#">Ayurveda Retreats</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4>Contact Us</h4>
+                    <ul style="list-style:none; color:rgba(255,255,255,0.7); font-size:14px; line-height:2;">
+                        <li>📍 No. 45, Galle Road, Colombo 03, Sri Lanka</li>
+                        <li>📞 +94 11 234 5678</li>
+                        <li>📧 hello@ceyloriaholidays.com</li>
+                        <li>📱 WhatsApp: +94 77 123 4567</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2025 Ceyloria Holidays. All rights reserved. SLTDA License: SLTDA/TO/2024/0045</p>
+                <div>
+                    <a href="#">Privacy Policy</a> • <a href="#">Terms of Service</a> • <a href="#">Cookie Policy</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Chat Widget -->
+    <button class="chat-trigger" id="chatToggle" aria-label="Open chat">
+        <svg class="open-icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+        </svg>
+        <svg class="close-icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none;">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+    </button>
+
+    <div class="chat-window" id="chatWindow">
+        <div class="chat-header">
+            <div class="chat-header-info">
+                <h3>Ceyloria Holidays</h3>
+                <p>AI Travel Concierge</p>
+            </div>
+            <div class="chat-header-actions">
+                <button id="languageBtn" aria-label="Change language" title="Language">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="2" y1="12" x2="22" y2="12"></line>
+                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                    </svg>
+                </button>
+                <button id="closeChat" aria-label="Close chat">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        
+        <div class="chat-messages" id="chatMessages">
+            <div class="message bot">
+                <div>Hello! 🇱🇰 Welcome to Ceyloria Holidays! How can I help you plan your Sri Lanka trip?</div>
+                <div class="message-time">Just now</div>
+            </div>
+        </div>
+        
+        <div class="typing-indicator" id="typingIndicator" style="display: none;">
+            <span></span><span></span><span></span>
+        </div>
+        
+        <div class="chat-input-area">
+            <div class="chat-input-wrapper">
+                <textarea class="chat-input" id="chatInput" placeholder="Type your message..." rows="1" aria-label="Type your message"></textarea>
+            </div>
+            <button class="send-button" id="sendButton" aria-label="Send message">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            const widget = document.getElementById('chatWidget');
+            const toggle = document.getElementById('chatToggle');
+            const window = document.getElementById('chatWindow');
+            const closeBtn = document.getElementById('closeChat');
+            const input = document.getElementById('chatInput');
+            const sendBtn = document.getElementById('sendButton');
+            const messages = document.getElementById('chatMessages');
+            const typing = document.getElementById('typingIndicator');
+            const langBtn = document.getElementById('languageBtn');
+            const langSelector = document.getElementById('languageSelector');
+            const langOptions = document.querySelectorAll('.language-option');
+            
+            const config = {
+                apiBase: '/widget',
+                tenantSlug: 'ceyloria-holidays',
+                primaryColor: '#e94560',
+                welcomeMessage: 'Hello! 🇱🇰 Welcome to Ceyloria Holidays! How can I help you plan your Sri Lanka trip?',
+                placeholder: 'Type your message...'
+            };
+            
+            let sessionId = 'session_' + Math.random().toString(36).substr(2, 9);
+            let currentLanguage = 'en';
+            let isProcessing = false;
+            
+            function toggleChat() {
+                widget.classList.toggle('open');
+                if (widget.classList.contains('open')) {
+                    input.focus();
+                }
+            }
+            
+            function addMessage(content, isUser = false, lang = 'en') {
+                const div = document.createElement('div');
+                div.className = 'message ' + (isUser ? 'user' : 'bot');
+                const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                div.innerHTML = content + (isUser ? '' : '<div class="message-time">' + lang.toUpperCase() + ' • ' + time + '</div>');
+                messages.appendChild(div);
+                messages.scrollTop = messages.scrollHeight;
+            }
+            
+            function showTyping() { typing.style.display = 'flex'; messages.scrollTop = messages.scrollHeight; }
+            function hideTyping() { typing.style.display = 'none'; }
+            
+            async function sendMessage() {
+                const text = input.value.trim();
+                if (!text || isProcessing) return;
+                
+                isProcessing = true;
+                sendBtn.disabled = true;
+                addMessage(text, true);
+                input.value = '';
+                input.style.height = 'auto';
+                showTyping();
+                
+                try {
+                    const response = await fetch('/widget/chat', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            message: text,
+                            language: currentLanguage,
+                            session_id: sessionId
+                        })
+                    });
+                    const data = await response.json();
+                    hideTyping();
+                    addMessage(data.response, false, data.language || 'en');
+                } catch (error) {
+                    hideTyping();
+                    addMessage('Sorry, I encountered an error. Please try again.', false, 'en');
+                } finally {
+                    isProcessing = false;
+                    sendBtn.disabled = false;
+                }
+            }
+            
+            sendBtn.addEventListener('click', sendMessage);
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+            
+            input.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+            });
+            
+            langBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                langSelector.classList.toggle('open');
+            });
+            
+            document.addEventListener('click', (e) => {
+                if (!langSelector.contains(e.target) && e.target !== langBtn) {
+                    langSelector.classList.remove('open');
+                }
+            });
+            
+            langOptions.forEach(opt => {
+                opt.addEventListener('click', () => {
+                    currentLanguage = opt.dataset.lang;
+                    langSelector.classList.remove('open');
+                    addSystemMessage(`Language changed to ${opt.textContent}`);
+                });
+            });
+            
+            function addSystemMessage(text) {
+                addMessage(text, false, 'system');
+            }
+            
+            toggle.addEventListener('click', toggleChat);
+            closeBtn.addEventListener('click', toggleChat);
+            
+            sendBtn.addEventListener('click', sendMessage);
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+            
+            input.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+            });
+            
+            document.addEventListener('click', (e) => {
+                if (!langSelector.contains(e.target) && e.target !== langBtn) {
+                    langSelector.classList.remove('open');
+                }
+            });
+            
+            langOptions.forEach(opt => {
+                opt.addEventListener('click', () => {
+                    currentLanguage = opt.dataset.lang;
+                    langSelector.classList.remove('open');
+                    addSystemMessage(`Language changed to ${opt.textContent}`);
+                });
+            });
+            
+            if (widget.classList.contains('open')) {
+                input.focus();
+            }
+        })();
+    </script>
+</body>
+</html>

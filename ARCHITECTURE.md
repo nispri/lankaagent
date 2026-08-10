@@ -67,10 +67,11 @@ Request → Correlation ID → Tenant Resolution → Auth → Rate Limit → Rou
 | **Checkpointing** | PostgresSaver (async) — full conversation history |
 | **Human-in-Loop** | `interrupt()` at quote presentation → Operator approval |
 | **Tools** | Structured tools (Pydantic args/returns) — no raw function calling |
-| **LLM Provider** | OpenRouter (multi-model, fallback chain) |
-| **Models** | Primary: Nemotron 3 Ultra (code/reasoning) / Fallback: Claude 3.5 Sonnet / GPT-4o |
-| **Temperature** | 0.1 (deterministic) for extraction, 0.7 for generation |
+| **LLM Provider** | OpenCode Zen (primary, free) + OpenRouter (fallback) |
+| **Models** | Primary: deepseek-v4-flash-free (Zen) / Fallback: same model via OpenRouter |
+| **Temperature** | 0.6 (concierge), 0.1 (deterministic) for extraction, 0.7 for generation |
 | **Multilingual** | Single graph, language in state → Prompt templates per language |
+| **Reply Guard** | Strict JSON `{"reply": ...}` protocol + reasoning stripper + empty-reply fallback |
 
 **Node Types:**
 | Node | Type | Tools Called |
@@ -151,6 +152,19 @@ CREATE TABLE audit_logs (id, tenant_id, user_id, action, entity_type, entity_id,
 | **Refunds** | Operator-initiated (dashboard) → Platform approval (SEV-2) |
 | **Invoicing** | Auto-generated PDF (operator branding) → Email + WhatsApp |
 | **Reconciliation** | Daily cron → Stripe/PayHere balance → Postgres → Operator payout report |
+
+### 2.7 Web Widget + Voice (live since Aug 2026)
+| Aspect | Decision |
+|--------|----------|
+| **Embed** | `/widget/embed` (full page, opens in new tab from landing page bubble) + `/widget/embed.js` |
+| **Chat API** | `POST /widget/chat` — message + language + session_id; per-session in-memory history (20 turns) |
+| **Concierge Persona** | "Anuki" — front-office concierge, 2–4 sentence replies, asks ONE clarifying question when unclear |
+| **Reply Protocol** | Strict JSON `{"reply": ...}` → `<reply>` tags → reasoning stripper (blocks internal-monologue leaks) |
+| **Voice Out** | `GET /widget/tts` — Microsoft Edge neural voices (EN=Jenny, RU=Svetlana, DE=Katja, FR=Denise, ZH=Xiaoxiao, SI=Sameera, TA=Pallavi) |
+| **Voice In** | `POST /widget/stt` — faster-whisper (tiny, int8), RAW audio bytes body, returns `{text, confidence, clear}` |
+| **Clarity Guard** | Garbled/short audio → Anuki asks a clarifying question instead of hallucinating |
+| **Custom Tour Pricing** | `app/integrations/tour_pricing.py` — 5/7/10/14-day quotes from real hotel rates + vehicle + margin (25.95%) |
+| **Provider Failover** | Zen (primary) → OpenRouter (fallback) → polite apology; 3× retry on empty replies (Zen free-tier flakiness) |
 
 ---
 

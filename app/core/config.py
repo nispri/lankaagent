@@ -107,6 +107,10 @@ class Settings(BaseSettings):
     # LLM Providers
     OPENROUTER_API_KEY: str | None = None
     OPENROUTER_BASE_URL: str = "https://openrouter.ai/api/v1"
+    OPENROUTER_MODEL: str = "deepseek-v4-flash-free"
+    ZEN_API_KEY: str | None = None
+    ZEN_BASE_URL: str = "https://opencode.ai/zen/v1"
+    ZEN_MODEL: str = "deepseek-v4-flash-free"
     LLM_MODEL_PRIMARY: str = "nvidia/nemotron-3-ultra"
     LLM_MODEL_FALLBACK_1: str = "anthropic/claude-3.5-sonnet"
     LLM_MODEL_FALLBACK_2: str = "openai/gpt-4o"
