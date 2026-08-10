@@ -376,19 +376,25 @@ WellnessProtocol:
 
 ## 7. Technical Implementation Plan
 
+> **Status snapshot (2026-08-10):** Sprint 0 ~85% ✅ · Sprint 1 ~70% ✅ (live widget) · Sprint 2-4 ⏳ not started.
+> ⚠️ **Deliberate deviation:** the agent is a direct LLM concierge (`app/integrations/llm_chat.py`, OpenCode Zen) rather than the planned LangGraph graph — shipped early to hit pilot-revenue goal; LangGraph orchestration deferred to Sprint 3 hardening.
+
 ### 7.1 Sprint 0 (Week 1-2): Foundation
-- [ ] Repo setup: Monorepo (FastAPI + LangGraph + React Dashboard)
-- [ ] Docker Compose: Postgres, Redis, FastAPI, Worker, Dashboard
-- [ ] Auth: JWT + Multi-tenant RLS (Row Level Security)
-- [ ] MCP Tourism Server v1: SLTDA stats + Attractions CSV import
-- [ ] CI/CD: GitHub Actions → Staging (Railway/Render) → Prod
+- [x] Repo setup: Monorepo (FastAPI + LangGraph + React Dashboard) — FastAPI monorepo live; LangGraph + React dashboard deferred
+- [x] Docker Compose: Postgres, Redis, FastAPI, Worker, Dashboard — api/postgres/redis live; worker/dashboard deferred
+- [x] Auth: JWT + Multi-tenant RLS (Row Level Security) — JWT done, RLS schema seeded
+- [ ] MCP Tourism Server v1: SLTDA stats + Attractions CSV import — **pending** (attractions live via `data/tour_data.py`)
+- [ ] CI/CD: GitHub Actions → Staging (Railway/Render) → Prod — **pending** (manual deploy via Vercel/ngrok)
 
 ### 7.2 Sprint 1 (Week 3-4): Core Agent + WhatsApp
-- [ ] LangGraph Travel Agent: Intent → Entities → Itinerary → Quote
-- [ ] WhatsApp Business API integration (Twilio)
-- [ ] Webhook handling: Incoming msg → Agent → Reply
-- [ ] Session management (Redis): 24hr context window
-- [ ] Multilingual: EN/SI/TA/RU/DE/ZH prompt templates
+- [x] ~~LangGraph Travel Agent~~ → **LLM concierge "Anuki"** (llm_chat.py): persona, 2-4 sentence replies, clarify-when-unclear, no reasoning leaks (strict JSON `{"reply"}` protocol)
+- [x] Web widget channel — `/widget/embed` + `/widget/chat` + `/widget/embed.js` (LIVE on ceyloria-site.vercel.app)
+- [x] Voice: server-side Edge neural TTS (7 langs) + faster-whisper STT with clarity guard (LIVE)
+- [x] Custom tour pricing — `tour_pricing.py`: 5/7/10/14-day quotes from real hotel rates (LIVE)
+- [x] WhatsApp webhook handling (Twilio sandbox, EN/RU verified) — production API **pending** (sandbox blocks SL numbers)
+- [x] Multilingual: RU verified; EN default — SI/TA/DE/ZH template verification **pending**
+- [ ] Session management (Redis): 24hr context window — in-memory now; Redis **pending**
+- [x] LLM provider: OpenCode Zen (free) primary + OpenRouter fallback + retry-on-empty (LIVE)
 
 ### 7.3 Sprint 2 (Week 5-6): Operator CRM + Payments
 - [ ] Operator Dashboard: Leads, Itineraries, Bookings, Calendar
@@ -403,6 +409,7 @@ WellnessProtocol:
 - [ ] 3 Pilot Operators onboarded (wife's network + SLTDA contacts)
 - [ ] End-to-end test: WhatsApp → Quote → Pay → Book → Docs → Trip
 - [ ] Analytics: PostHog self-hosted + Custom dashboards
+- [ ] LangGraph orchestration upgrade (replaces direct concierge engine)
 
 ### 7.5 Sprint 4 (Week 9-10): Hardening + Scale Prep
 - [ ] Load testing (100 concurrent conversations)
