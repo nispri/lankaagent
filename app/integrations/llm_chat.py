@@ -149,6 +149,56 @@ def _strip_reasoning(text: str) -> str:
     return (sentences[-1] if sentences else text)[:600]
 
 
+async def _mcp_enrich(message: str) -> str | None:
+    """Query the MCP Tourism Server for authoritative data relevant to the message.
+
+    Returns a compact context string for the system prompt, or None if the
+    message has no data intent or the MCP server is unreachable (graceful
+    degradation to the static knowledge base).
+    """
+    import re as _re
+
+    text = message.lower()
+
+    # Decide which MCP tool to call based on the message intent.
+    if _re.search(r"\b(quote|price|cost|how much|rate|budget|pp|per person|pax)\b", text) or \
+            _re.search(r"\b(\d+)[- ]?day\b", text):
+        tool, label, args = "get_tour_quote", "Quote request", _quote_args(text)
+    elif _re.search(r"\b(attraction|sight|see|visit|wildlife|beach|heritage|nature|temple|park|safari)\b", text):
+        tool, label, args = "search_attractions", "Available attractions", {"limit": 8}
+    elif _re.search(r"\b(hotel|stay|accommodation|where to sleep|resort)\b", text):
+        tool, label, args = "get_hotels", "Hotel network", {}
+    elif _re.search(r"\b(visa|eta|entry requirement|do i need)\b", text):
+        tool, label, args = "get_visa_requirements", "Visa info", {"nationality": "General"}
+    else:
+        return None
+
+    try:
+        from app.integrations.mcp_client import mcp_tool_call
+
+        result = await mcp_tool_call(tool, args)
+    except Exception:
+        return None
+    if not result:
+        return None
+    return f"{label}: {result}"
+
+
+def _quote_args(text: str) -> dict:
+    """Extract pax + days from a quote request message."""
+    import re as _re
+
+    pax = 2
+    m = _re.search(r"\b(2|4|6|10)\b", text)
+    if m:
+        pax = int(m.group(1))
+    days = 14
+    m = _re.search(r"\b(\d+)[- ]?day\b", text)
+    if m:
+        days = int(m.group(1))
+    return {"pax": pax, "days": days}
+
+
 def _extract_reply(text: str) -> str:
     """Extract the spoken reply. Priority: JSON {"reply": ...} → <reply> tags → stripper."""
     if not text:
@@ -231,6 +281,17 @@ class LLMChatEngine:
                 "tour names). Keep the same warm, professional concierge tone."
             ),
         })
+        # MCP enrichment — query the Tourism Server for authoritative data on
+        # pricing/attraction/hotel/visa intents, then ground the reply in it.
+        mcp_context = await _mcp_enrich(message)
+        if mcp_context:
+            messages.append({
+                "role": "system",
+                "content": (
+                    "AUTHORITATIVE TOUR DATA (from the MCP Tourism Server — use this "
+                    "over anything else):\n" + mcp_context
+                ),
+            })
         messages.append({"role": "user", "content": message})
 
         payload = {

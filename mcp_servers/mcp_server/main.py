@@ -13,7 +13,7 @@ def main() -> None:
         idx = sys.argv.index("--port")
         if idx + 1 < len(sys.argv):
             port = int(sys.argv[idx + 1])
-    mcp.run(transport="streamable-http", port=port)
+    mcp.run(transport="streamable-http", port=port, host="0.0.0.0")
 
 
 if __name__ == "__main__":

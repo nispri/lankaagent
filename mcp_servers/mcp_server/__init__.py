@@ -167,11 +167,11 @@ async def get_tour_quote(pax: int, days: int = 14) -> dict:
         days: Tour length in days (5, 7, 10, or 14).
     """
     try:
-        from app.integrations.tour_pricing import (
-            quote_custom_tour,  # type: ignore[import-not-found]
+        from data.tour_pricing import (  # type: ignore[import-not-found]
+            quote_custom_tour,
         )
 
-        return quote_custom_tour(pax=pax, days=days)
+        return quote_custom_tour(days=days, pax=pax)
     except Exception:
         rates = TOUR_PRICING.get("rates", {}).get("per_person_double", {})
         per_person = rates.get(pax, rates.get(2, 2490))
