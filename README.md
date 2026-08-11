@@ -1,6 +1,6 @@
 # LankaAgent — AI Travel Concierge for Sri Lanka Tour Operators
 
-> **⚡ North Star: REVENUE.** Every feature must pass the Revenue Filter (DEC-20260810-001) — it must add money or unblock a money-earning step. **No vanity features.** See [REVENUE-PLAN.md](REVENUE-PLAN.md) (all streams, costs, projections, targets) + [SPEC.md](SPEC.md) + [decisions/DECISION-LOG.md](decisions/DECISION-LOG.md).
+> **⚡ North Star: REVENUE.** Every feature must pass the Revenue Filter (DEC-20260810-001) — it must add money or unblock a money-earning step. **No vanity features.** See [REVENUE-PLAN.md](REVENUE-PLAN.md) (all streams, costs, projections, targets) + [SPEC.md](SPEC.md) + [decisions/DECISION-LOG.md](decisions/DECISION-LOG.md). **[TESTING.md](TESTING.md)** has the hands-on test playbook (browser / phone / API / MCP verification).
 
 [![CI](https://github.com/nispri/lankaagent/workflows/CI/badge.svg)](https://github.com/nispri/lankaagent/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
