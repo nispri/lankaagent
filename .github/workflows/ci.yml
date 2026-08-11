@@ -21,7 +21,9 @@ jobs:
         run: |
           pip install --upgrade pip
           pip install -r requirements.txt
-          pip install ruff pytest pytest-asyncio httpx
+          # Pin ruff to the same version as local dev (0.6.2) — newer ruff
+          # releases enable new rules that fire on the existing codebase.
+          pip install "ruff==0.6.2" pytest pytest-asyncio httpx
 
       - name: Ruff lint
         run: ruff check app/ tests/ tunnel.py mcp_servers/
