@@ -200,7 +200,7 @@ class LLMChatEngine:
     async def chat(
         self,
         message: str,
-        _language: str = "en",
+        language: str = "en",
         history: list[dict[str, str]] | None = None,
     ) -> str:
         """Send message to the LLM with tour knowledge + conversation history.
@@ -214,6 +214,23 @@ class LLMChatEngine:
             for turn in history[-6:]:  # keep last 6 turns of context
                 if turn.get("role") in ("user", "assistant") and turn.get("content"):
                     messages.append({"role": turn["role"], "content": turn["content"]})
+        # Explicit language instruction — the free-tier model needs it spelled out
+        # or it drifts back to English. Injected as a system-style instruction so
+        # it cannot be overridden by the guest's message content.
+        lang_names = {
+            "en": "English", "ru": "Russian", "de": "German", "fr": "French",
+            "zh": "Chinese", "si": "Sinhala", "ta": "Tamil",
+        }
+        target_lang = lang_names.get(language, lang_names["en"])
+        messages.append({
+            "role": "system",
+            "content": (
+                f"IMPORTANT: Reply ONLY in {target_lang} ({language}). "
+                f"Every sentence must be in {target_lang}. "
+                "Never switch to English except for proper nouns (hotels, cities, "
+                "tour names). Keep the same warm, professional concierge tone."
+            ),
+        })
         messages.append({"role": "user", "content": message})
 
         payload = {

@@ -378,15 +378,15 @@ WellnessProtocol:
 
 ## 7. Technical Implementation Plan
 
-> **Status snapshot (2026-08-10):** Sprint 0 ~85% ✅ · Sprint 1 ~70% ✅ (live widget) · Sprint 2-4 ⏳ not started.
+> **Status snapshot (2026-08-11):** Sprint 0 ~95% ✅ (MCP v1 real data + CI workflow added) · Sprint 1 ~90% ✅ (Redis sessions + 7-lang verified live) · Sprint 2-4 ⏳ not started.
 > ⚠️ **Deliberate deviation:** the agent is a direct LLM concierge (`app/integrations/llm_chat.py`, OpenCode Zen) rather than the planned LangGraph graph — shipped early to hit pilot-revenue goal; LangGraph orchestration deferred to Sprint 3 hardening.
 
 ### 7.1 Sprint 0 (Week 1-2): Foundation
 - [x] Repo setup: Monorepo (FastAPI + LangGraph + React Dashboard) — FastAPI monorepo live; LangGraph + React dashboard deferred
 - [x] Docker Compose: Postgres, Redis, FastAPI, Worker, Dashboard — api/postgres/redis live; worker/dashboard deferred
 - [x] Auth: JWT + Multi-tenant RLS (Row Level Security) — JWT done, RLS schema seeded
-- [ ] MCP Tourism Server v1: SLTDA stats + Attractions CSV import — **pending** (attractions live via `data/tour_data.py`)
-- [ ] CI/CD: GitHub Actions → Staging (Railway/Render) → Prod — **pending** (manual deploy via Vercel/ngrok)
+- [x] MCP Tourism Server v1: SLTDA stats + Attractions CSV import — **DONE 2026-08-11** (6 real-data tools: search_attractions, get_attraction_details, get_seasonal_pricing, get_visa_requirements, get_tour_quote, get_hotels — wired to `data/tour_data.py`, live in `lankaagent-mcp` container)
+- [x] CI/CD: GitHub Actions → Staging (Railway/Render) → Prod — **CI added 2026-08-11** (`.github/workflows/ci.yml`: ruff + pytest + docker image builds); staging deploy via Vercel/ngrok manual for now
 
 ### 7.2 Sprint 1 (Week 3-4): Core Agent + WhatsApp
 - [x] ~~LangGraph Travel Agent~~ → **LLM concierge "Anuki"** (llm_chat.py): persona, 2-4 sentence replies, clarify-when-unclear, no reasoning leaks (strict JSON `{"reply"}` protocol)
@@ -394,8 +394,8 @@ WellnessProtocol:
 - [x] Voice: server-side Edge neural TTS (7 langs) + faster-whisper STT with clarity guard (LIVE)
 - [x] Custom tour pricing — `tour_pricing.py`: 5/7/10/14-day quotes from real hotel rates (LIVE)
 - [x] WhatsApp webhook handling (Twilio sandbox, EN/RU verified) — production API **pending** (sandbox blocks SL numbers)
-- [x] Multilingual: RU verified; EN default — SI/TA/DE/ZH template verification **pending**
-- [ ] Session management (Redis): 24hr context window — in-memory now; Redis **pending**
+- [x] Multilingual: **all 7 languages verified LIVE 2026-08-11** — RU/DE/FR/ZH/SI/TA/EN (explicit per-language system instruction in `llm_chat.py`; earlier "garbled" results were shell UTF-8 test artifacts, not app faults)
+- [x] Session management (Redis): **DONE 2026-08-11** — 24hr TTL context window via `app/core/redis.py` (verified: TTL 86,378s, 6-turn persistence; in-memory fallback if Redis down)
 - [x] LLM provider: OpenCode Zen (free) primary + OpenRouter fallback + retry-on-empty (LIVE)
 
 ### 7.3 Sprint 2 (Week 5-6): Operator CRM + Payments

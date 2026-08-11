@@ -1,4 +1,6 @@
 """LankaAgent Chat Widget — Embeddable Chat Widget for Websites"""
+import json
+
 from fastapi import APIRouter, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
@@ -7,8 +9,38 @@ from pydantic import BaseModel
 router = APIRouter()
 templates = Jinja2Templates(directory="app/integrations/chat_widget/templates")
 
-# In-process conversation memory per session (swap for Redis in production)
+# Session storage: Redis primary (24h TTL), in-memory fallback if Redis is down.
+# The in-memory dict keeps working during Redis outages so guests are never blocked.
 _conversations: dict[str, list[dict[str, str]]] = {}
+_SESSION_TTL = 24 * 60 * 60  # 24-hour context window per SPEC Sprint 1
+
+
+async def _load_history(session_id: str) -> list[dict[str, str]]:
+    """Load conversation history — Redis first, in-memory fallback."""
+    try:
+        from app.core.redis import redis_client
+
+        raw = await redis_client.get(f"session:{session_id}")
+        if raw:
+            data = json.loads(raw)
+            return data if isinstance(data, list) else []
+        return _conversations.get(session_id, [])
+    except Exception:
+        # Redis unavailable — fall back to in-memory so the guest is never blocked
+        return _conversations.get(session_id, [])
+
+
+async def _save_history(session_id: str, history: list[dict[str, str]]) -> None:
+    """Save conversation history — Redis with 24h TTL, in-memory fallback."""
+    _conversations[session_id] = history
+    try:
+        from app.core.redis import redis_client
+
+        await redis_client.set(
+            f"session:{session_id}", json.dumps(history), ex=_SESSION_TTL
+        )
+    except Exception:
+        pass  # in-memory copy already saved; Redis will re-sync on next load
 
 
 class ChatMessage(BaseModel):
@@ -660,13 +692,14 @@ async def chat_endpoint(message: dict) -> dict:
     from app.integrations.llm_chat import get_engine
 
     message_text = message.get("message", "")
+    language = message.get("language", "en")
     session_id = message.get("session_id") or f"anon-{hash(message_text) % 100000}"
 
-    # Conversation memory per session (in-process; swap for Redis in prod)
-    history = _conversations.setdefault(session_id, [])
+    # Conversation memory per session (Redis with 24h TTL; in-memory fallback)
+    history = await _load_history(session_id)
 
     engine = get_engine()
-    reply = await engine.chat(message_text, history=history)
+    reply = await engine.chat(message_text, language=language, history=history)
 
     # Guard against empty replies — never leave the guest hanging
     if not reply or not reply.strip():
@@ -676,7 +709,8 @@ async def chat_endpoint(message: dict) -> dict:
     history.append({"role": "user", "content": message_text})
     history.append({"role": "assistant", "content": reply})
     if len(history) > 20:
-        _conversations[session_id] = history[-20:]
+        history = history[-20:]
+    await _save_history(session_id, history)
 
     # Simple language detect for the widget label
     lang = "ru" if any(ord(c) > 1024 for c in message_text) else "en"
