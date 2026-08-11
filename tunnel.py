@@ -10,10 +10,15 @@ import sys
 import time
 from contextlib import suppress
 
+from dotenv import load_dotenv
 from pyngrok import conf, ngrok
 
-# Read from env so the token never lives in the repo. Set in ~/.bashrc or .env:
-#   export NGROK_AUTH_TOKEN=...
+# Load token from lankaagent/.env (gitignored) so the tunnel works without
+# the token being exported in the shell. Env var still wins if set.
+load_dotenv()
+
+# Read from env so the token never lives in the repo. Set in .env or shell:
+#   NGROK_AUTH_TOKEN=...
 AUTH_TOKEN = os.environ.get("NGROK_AUTH_TOKEN", "")
 PORT = 8000
 
