@@ -31,7 +31,9 @@ jobs:
       - name: Run tests
         env:
           SECRET_KEY: ci-test-secret-key-that-is-at-least-32-characters-long
-          DATABASE_URL: sqlite+aiosqlite:///./test.db
+          # PostgresDsn-validated; tests use in-memory ASGITransport so the
+          # URL is never actually connected.
+          DATABASE_URL: postgresql+asyncpg://ci:ci@localhost:5432/ci
           REDIS_URL: redis://localhost:6379/0
           MOCK_EXTERNAL_APIS: "true"
         run: |
