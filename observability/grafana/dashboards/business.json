@@ -1,0 +1,148 @@
+{
+  "title": "LankaAgent Business Metrics",
+  "uid": "lankaagent-business",
+  "tags": ["lankaagent", "business"],
+  "timezone": "browser",
+  "schemaVersion": 38,
+  "version": 1,
+  "refresh": "30s",
+  "panels": [
+    {
+      "title": "Leads Created (24h)",
+      "type": "stat",
+      "gridPos": {"x": 0, "y": 0, "w": 6, "h": 4},
+      "targets": [
+        {
+          "expr": "increase(leads_created_total[24h])",
+          "format": "time_series"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds", "thresholds": {"steps": [{"value": null, "color": "green"}, {"value": 50, "color": "yellow"}, {"value": 100, "color": "red"}]}}
+        }
+      }
+    },
+    {
+      "title": "Quotes Generated (24h)",
+      "type": "stat",
+      "gridPos": {"x": 6, "y": 0, "w": 6, "h": 4},
+      "targets": [
+        {
+          "expr": "increase(quotes_generated_total[24h])",
+          "format": "time_series"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds", "thresholds": {"steps": [{"value": null, "color": "green"}]}}
+        }
+      }
+    },
+    {
+      "title": "Bookings (24h)",
+      "type": "stat",
+      "gridPos": {"x": 12, "y": 0, "w": 6, "h": 4},
+      "targets": [
+        {
+          "expr": "increase(bookings_total[24h])",
+          "format": "time_series"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds", "thresholds": {"steps": [{"value": null, "color": "green"}]}}
+        }
+      }
+    },
+    {
+      "title": "Conversion Rate (24h)",
+      "type": "gauge",
+      "gridPos": {"x": 18, "y": 0, "w": 6, "h": 4},
+      "targets": [
+        {
+          "expr": "bookings_total / max(leads_created_total, 1) * 100",
+          "format": "time_series"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "color": {"mode": "thresholds", "thresholds": {"steps": [{"value": null, "color": "green"}, {"value": 10, "color": "yellow"}, {"value": 5, "color": "red"}]}}
+        }
+      }
+    },
+    {
+      "title": "MRR (USD)",
+      "type": "stat",
+      "gridPos": {"x": 0, "y": 4, "w": 6, "h": 4},
+      "targets": [
+        {
+          "expr": "sum(mrr_usd) / 100",
+          "format": "time_series"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD",
+          "color": {"mode": "thresholds", "thresholds": {"steps": [{"value": null, "color": "green"}]}}
+        }
+      }
+    },
+    {
+      "title": "Active Tenants",
+      "type": "stat",
+      "gridPos": {"x": 6, "y": 4, "w": 6, "h": 4},
+      "targets": [
+        {
+          "expr": "active_tenants",
+          "format": "time_series"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds", "thresholds": {"steps": [{"value": null, "color": "green"}]}}
+        }
+      }
+    },
+    {
+      "title": "Language Distribution (24h)",
+      "type": "piechart",
+      "gridPos": {"x": 12, "y": 4, "w": 12, "h": 8},
+      "targets": [
+        {
+          "expr": "sum by (language) (rate(chat_messages_total[24h]))",
+          "format": "time_series"
+        }
+      ]
+    },
+    {
+      "title": "Leads by Source (7d)",
+      "type": "bargauge",
+      "gridPos": {"x": 0, "y": 12, "w": 12, "h": 8},
+      "targets": [
+        {
+          "expr": "sum by (source) (increase(leads_created_total[7d]))",
+          "format": "time_series"
+        }
+      ]
+    },
+    {
+      "title": "Quotes by Duration (7d)",
+      "type": "piechart",
+      "gridPos": {"x": 12, "y": 12, "w": 12, "h": 8},
+      "targets": [
+        {
+          "expr": "sum by (duration) (increase(quotes_generated_total[7d]))",
+          "format": "time_series"
+        }
+      ]
+    }
+  ],
+  "time": {
+    "from": "now-24h",
+    "to": "now"
+  }
+}

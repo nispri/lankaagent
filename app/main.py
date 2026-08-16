@@ -2,12 +2,14 @@
 LankaAgent API — FastAPI Application Entry Point
 """
 from contextlib import asynccontextmanager
+import time
 
 import structlog
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import JSONResponse
+from prometheus_client import CONTENT_TYPE_LATEST, Counter, Gauge, Histogram, generate_latest
 from sqlalchemy import text
 
 from app.api.v1.router import api_router
@@ -23,6 +25,27 @@ from app.core.middleware import (
 from app.core.redis import redis_client
 from app.integrations.chat_widget.router import router as chat_widget_router
 from app.integrations.whatsapp import router as whatsapp_router
+
+# Prometheus metrics
+REQUEST_COUNT = Counter(
+    "http_requests_total",
+    "Total HTTP requests",
+    ["method", "endpoint", "status"],
+)
+REQUEST_LATENCY = Histogram(
+    "http_request_duration_seconds",
+    "HTTP request latency in seconds",
+    ["method", "endpoint"],
+)
+ACTIVE_SESSIONS = Gauge("active_sessions", "Active chat sessions")
+MCP_CALLS = Counter("mcp_calls_total", "MCP tool calls", ["tool", "status"])
+LLM_CALLS = Counter("llm_calls_total", "LLM provider calls", ["provider", "model", "status"])
+ACTIVE_TENANTS = Gauge("active_tenants", "Active tenants")
+LEADS_CREATED = Counter("leads_created_total", "Total leads created")
+QUOTES_GENERATED = Counter("quotes_generated_total", "Total quotes generated")
+BOOKINGS_TOTAL = Counter("bookings_total", "Total bookings")
+CHAT_MESSAGES = Counter("chat_messages_total", "Total chat messages", ["language"])
+MRR_USD = Gauge("mrr_usd", "Monthly recurring revenue in cents")
 
 # Configure structured logging
 structlog.configure(
@@ -99,6 +122,24 @@ def create_app() -> FastAPI:
     app.add_middleware(TenantMiddleware)
     app.add_middleware(RateLimitMiddleware)
 
+    # Prometheus metrics middleware
+    @app.middleware("http")
+    async def metrics_middleware(request: Request, call_next):
+        start_time = time.time()
+        response = await call_next(request)
+        duration = time.time() - start_time
+
+        REQUEST_COUNT.labels(
+            method=request.method,
+            endpoint=request.url.path,
+            status=response.status_code,
+        ).inc()
+        REQUEST_LATENCY.labels(
+            method=request.method,
+            endpoint=request.url.path,
+        ).observe(duration)
+        return response
+
     # Exception handlers
     app.add_exception_handler(LankaAgentException, lankaagent_exception_handler)
 
@@ -162,6 +203,11 @@ def create_app() -> FastAPI:
             "docs": "/docs",
             "health": "/health",
         }
+
+    # Prometheus metrics endpoint
+    @app.get("/metrics", tags=["Monitoring"])
+    async def metrics() -> Response:
+        return Response(content=generate_latest(), media_type=CONTENT_TYPE_LATEST)
 
     return app
 

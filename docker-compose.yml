@@ -203,18 +203,18 @@ services:
   # OBSERVABILITY
   # ─────────────────────────────────────────────────────────────
   grafana:
-    image: grafana/grafana:10.2
+    image: grafana/grafana:11.0.0
     container_name: lankaagent-grafana
     environment:
       - GF_SECURITY_ADMIN_USER=${GRAFANA_USER:-admin}
-      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
-      - GF_INSTALL_PLUGINS=grafana-piechart-panel
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
+      - GF_USERS_ALLOW_SIGN_UP=false
     volumes:
       - grafana_data:/var/lib/grafana
       - ./observability/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
       - ./observability/grafana/datasources:/etc/grafana/provisioning/datasources:ro
     ports:
-      - "3001:3000"
+      - "3000:3000"
     depends_on:
       - prometheus
     networks:
@@ -223,30 +223,44 @@ services:
     restart: unless-stopped
 
   prometheus:
-    image: prom/prometheus:v2.47
+    image: prom/prometheus:v2.53.0
     container_name: lankaagent-prometheus
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
       - '--storage.tsdb.retention.time=30d'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
     volumes:
       - prometheus_data:/prometheus
-      - ./observability/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./observability/prometheus.yml:/etc/prometheus/prometheus.yml:ro
     ports:
-      - "9090:9090"
+      - "9091:9090"
     networks:
       - lankaagent-internal
     restart: unless-stopped
 
   loki:
-    image: grafana/loki:2.9
+    image: grafana/loki:2.9.0
     container_name: lankaagent-loki
     command: -config.file=/etc/loki/local-config.yaml
     volumes:
       - loki_data:/loki
-      - ./observability/loki/local-config.yaml:/etc/loki/local-config.yaml:ro
+      - ./observability/loki-config.yml:/etc/loki/local-config.yaml:ro
     ports:
       - "3100:3100"
+    networks:
+      - lankaagent-internal
+    restart: unless-stopped
+
+  promtail:
+    image: grafana/promtail:2.9.0
+    container_name: lankaagent-promtail
+    volumes:
+      - ./observability/promtail-config.yml:/etc/promtail/config.yml:ro
+      - /var/log:/var/log:ro
+      - ./logs:/app/logs:ro
+    command: -config.file=/etc/promtail/config.yml
     networks:
       - lankaagent-internal
     restart: unless-stopped
