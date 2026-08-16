@@ -23,12 +23,12 @@
 ### 2.1 Technical verification (5 min before call)
 ```bash
 # 1. Stack health
-curl -sf https://cycling-handwash-oversweet.ngrok-free.dev/health/ready
+curl -sf https://synthetic-flavor-boutique-zero.trycloudflare.com/health/ready
 docker ps --format "{{.Names}} | {{.Status}}" | grep -E "api|mcp|postgres|redis"
 
 # 2. Widget loads
-open https://cycling-handwash-oversweet.ngrok-free.dev/widget/embed
-# Click "Visit Site" once if ngrok interstitial appears
+open https://synthetic-flavor-boutique-zero.trycloudflare.com/widget/embed
+# Click "Visit Site" once if Cloudflare interstitial appears
 
 # 3. MCP trace ready (separate terminal)
 docker logs -f lankaagent-mcp | grep "POST /mcp"
@@ -188,7 +188,7 @@ docker logs -f lankaagent-mcp | grep "POST /mcp"
 
 | Asset | URL |
 |---|---|
-| **Widget demo** | `https://cycling-handwash-oversweet.ngrok-free.dev/widget/embed` |
+| **Widget demo** | `https://synthetic-flavor-boutique-zero.trycloudflare.com/widget/embed` |
 | **Ceyloria landing (customer view)** | `https://ceyloria-site.vercel.app` |
 | **Pilot Agreement template** | `PILOT-OUTREACH.md` (Appendix A) |
 | **Pricing one-pager** | `REVENUE-PLAN.md` § Pricing Tiers |
