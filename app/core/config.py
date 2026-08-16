@@ -107,7 +107,7 @@ class Settings(BaseSettings):
     # LLM Providers
     OPENROUTER_API_KEY: str | None = None
     OPENROUTER_BASE_URL: str = "https://openrouter.ai/api/v1"
-    OPENROUTER_MODEL: str = "deepseek-v4-flash-free"
+    OPENROUTER_MODEL: str = "deepseek/deepseek-chat-v3-0324"
     ZEN_API_KEY: str | None = None
     ZEN_BASE_URL: str = "https://opencode.ai/zen/v1"
     ZEN_MODEL: str = "deepseek-v4-flash-free"

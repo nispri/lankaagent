@@ -1,15 +1,13 @@
-"""
-Real LLM Chat Engine — powers the Ceyloria widget with genuine AI via OpenRouter free models.
+"""Real LLM Chat Engine — powers the Ceyloria widget with genuine AI via OpenRouter free models.
 Knowledge base: real tour data from data/tour_data.py
 """
 
 import asyncio
-
 import httpx
+import logging
 from app.core.config import settings
 from app.integrations.tour_pricing import quote_table
 from data.tour_data import ATTRACTIONS, HOTELS, ITINERARY, TOUR_PRICING
-
 
 # ─────────────────────────────────────────────────────────────
 # KNOWLEDGE BASE — built from real tour data
@@ -95,7 +93,6 @@ TOUR KNOWLEDGE:
 
 
 # In-process conversation memory per session lives in chat_widget/router.py
-
 
 # ─────────────────────────────────────────────────────────────
 # REASONING STRIPPER — removes any internal monologue the model
@@ -234,16 +231,195 @@ def _extract_reply(text: str) -> str:
 
 
 # ─────────────────────────────────────────────────────────────
+# LLM PROVIDER POOL — free model rotation to avoid rate limits
+# ─────────────────────────────────────────────────────────────
+from dataclasses import dataclass
+from typing import Literal
+import time
+
+
+@dataclass
+class ProviderConfig:
+    """Configuration for a single LLM provider/model combination."""
+    name: str                              # e.g. "zen-deepseek", "or-deepseek-chat"
+    provider: Literal["zen", "openrouter"]  # provider type
+    model: str                             # model identifier
+    base_url: str                          # API base URL
+    api_key: str | None = None             # API key (from settings)
+    extra_headers: dict | None = None      # additional headers
+    max_retries: int = 3                   # retries before rotating
+    timeout: int = 30                      # request timeout
+
+
+@dataclass
+class ProviderState:
+    """Runtime state for a provider."""
+    config: ProviderConfig
+    consecutive_failures: int = 0
+    last_failure_time: float = 0
+    last_switch_log: str = ""
+
+
+# Default free model pool — ordered by quality/preference
+DEFAULT_PROVIDER_POOL: list[ProviderConfig] = [
+    # Primary: OpenCode Zen (best quality for reasoning)
+    ProviderConfig(
+        name="zen-deepseek-v4",
+        provider="zen",
+        model="deepseek-v4-flash-free",
+        base_url="https://opencode.ai/zen/v1",
+        api_key=None,  # filled from settings at runtime
+    ),
+    # Fallback 1: OpenRouter deepseek-chat-v3-0324 (free, good quality)
+    ProviderConfig(
+        name="or-deepseek-chat-v3",
+        provider="openrouter",
+        model="deepseek/deepseek-chat-v3-0324",
+        base_url="https://openrouter.ai/api/v1",
+        api_key=None,
+        extra_headers={
+            "HTTP-Referer": "https://ceyloria-site.vercel.app",
+            "X-Title": "Ceyloria Holidays Concierge",
+        },
+    ),
+    # Fallback 2: OpenRouter Llama 3.1 8B (free, fast)
+    ProviderConfig(
+        name="or-llama-3.1-8b",
+        provider="openrouter",
+        model="meta-llama/llama-3.1-8b-instruct:free",
+        base_url="https://openrouter.ai/api/v1",
+        api_key=None,
+        extra_headers={
+            "HTTP-Referer": "https://ceyloria-site.vercel.app",
+            "X-Title": "Ceyloria Holidays Concierge",
+        },
+    ),
+    # Fallback 3: OpenRouter Gemma 2 9B (free, good for chat)
+    ProviderConfig(
+        name="or-gemma-2-9b",
+        provider="openrouter",
+        model="google/gemma-2-9b-it:free",
+        base_url="https://openrouter.ai/api/v1",
+        api_key=None,
+        extra_headers={
+            "HTTP-Referer": "https://ceyloria-site.vercel.app",
+            "X-Title": "Ceyloria Holidays Concierge",
+        },
+    ),
+    # Fallback 4: OpenRouter Phi-3 Mini (free, 128k context)
+    ProviderConfig(
+        name="or-phi-3-mini",
+        provider="openrouter",
+        model="microsoft/phi-3-mini-128k-instruct:free",
+        base_url="https://openrouter.ai/api/v1",
+        api_key=None,
+        extra_headers={
+            "HTTP-Referer": "https://ceyloria-site.vercel.app",
+            "X-Title": "Ceyloria Holidays Concierge",
+        },
+    ),
+]
+
+
+class ProviderPool:
+    """Manages a pool of free LLM providers with automatic rotation on failures."""
+
+    def __init__(self, settings_obj, pool: list[ProviderConfig] | None = None):
+        self.settings = settings_obj
+        self.pool = pool or DEFAULT_PROVIDER_POOL
+        self._states: dict[str, ProviderState] = {}
+        self._current_idx = 0
+        self._initialize_pool()
+
+    def _initialize_pool(self) -> None:
+        """Fill in API keys from settings and create state objects."""
+        for cfg in self.pool:
+            if cfg.provider == "zen":
+                cfg.api_key = self.settings.ZEN_API_KEY
+                cfg.base_url = self.settings.ZEN_BASE_URL or cfg.base_url
+            elif cfg.provider == "openrouter":
+                cfg.api_key = self.settings.OPENROUTER_API_KEY
+                cfg.base_url = self.settings.OPENROUTER_BASE_URL or cfg.base_url
+            self._states[cfg.name] = ProviderState(config=cfg)
+
+    @property
+    def current(self) -> ProviderConfig:
+        """Get the current provider config."""
+        return self.pool[self._current_idx].config
+
+    @property
+    def current_name(self) -> str:
+        return self.pool[self._current_idx].name
+
+    def _log_switch(self, from_name: str, to_name: str, reason: str) -> None:
+        """Log a provider switch."""
+        logger = logging.getLogger(__name__)
+        msg = f"🔄 Model switch: {from_name} → {to_name} — reason: {reason}"
+        logger.warning(msg)
+        # Also update state for debugging
+        if to_name in self._states:
+            self._states[to_name].last_switch_log = msg
+
+    def record_success(self, name: str) -> None:
+        """Reset failure count on success."""
+        if name in self._states:
+            self._states[name].consecutive_failures = 0
+
+    def record_failure(self, name: str, reason: str = "error") -> bool:
+        """Record a failure; return True if should rotate."""
+        if name not in self._states:
+            return False
+        state = self._states[name]
+        state.consecutive_failures += 1
+        state.last_failure_time = time.time()
+        if state.consecutive_failures >= state.config.max_retries:
+            self._rotate(reason=f"{reason} (retries exhausted)")
+            return True
+        return False
+
+    def _rotate(self, reason: str) -> None:
+        """Rotate to the next provider in the pool."""
+        old_name = self.current_name
+        # Find next provider with API key available
+        for _ in range(len(self.pool)):
+            self._current_idx = (self._current_idx + 1) % len(self.pool)
+            next_cfg = self.pool[self._current_idx]
+            if next_cfg.api_key:
+                self._log_switch(old_name, next_cfg.name, reason)
+                return
+        # If we looped back to original, stay but log
+        self._log_switch(old_name, old_name, f"no alternative with API key; {reason}")
+
+    def get_available_providers(self) -> list[ProviderConfig]:
+        """Get all providers that have API keys configured."""
+        return [p for p in self.pool if p.api_key]
+
+    def status(self) -> dict:
+        """Return pool status for debugging."""
+        return {
+            "current": self.current_name,
+            "providers": [
+                {
+                    "name": p.name,
+                    "provider": p.provider,
+                    "model": p.model,
+                    "has_key": bool(p.api_key),
+                    "failures": self._states.get(p.name, ProviderState(config=p)).consecutive_failures,
+                    "last_switch": self._states.get(p.name, ProviderState(config=p)).last_switch_log,
+                }
+                for p in self.pool
+            ],
+        }
+
+
+# ─────────────────────────────────────────────────────────────
 # LLM ENGINE
 # ─────────────────────────────────────────────────────────────
 class LLMChatEngine:
-    """Chat engine backed by OpenCode Zen (primary) with OpenRouter fallback."""
+    """Chat engine backed by ProviderPool with automatic free-model rotation."""
 
     def __init__(self):
-        self.zen_url = settings.ZEN_BASE_URL or "https://opencode.ai/zen/v1"
-        self.zen_model = settings.ZEN_MODEL or "deepseek-v4-flash-free"
-        self.or_url = settings.OPENROUTER_BASE_URL or "https://openrouter.ai/api/v1"
-        self.or_model = settings.OPENROUTER_MODEL or "deepseek-v4-flash-free"
+        self.provider_pool = ProviderPool(settings)
         self.knowledge = build_knowledge_base()
         self.system = SYSTEM_PROMPT.format(knowledge=self.knowledge)
 
@@ -255,8 +431,7 @@ class LLMChatEngine:
     ) -> str:
         """Send message to the LLM with tour knowledge + conversation history.
 
-        Primary: OpenCode Zen (free deepseek-v4-flash-free).
-        Fallback: OpenRouter (same model family). Returns a clean spoken reply.
+        Uses ProviderPool for automatic free-model rotation on rate limits/errors.
         """
         # Build conversation messages: system + history + current
         messages = [{"role": "system", "content": self.system}]
@@ -294,8 +469,7 @@ class LLMChatEngine:
             })
         messages.append({"role": "user", "content": message})
 
-        payload = {
-            "model": self.zen_model,
+        base_payload = {
             "messages": messages,
             "temperature": 0.6,
             "max_tokens": 2000,
@@ -305,32 +479,32 @@ class LLMChatEngine:
             # _extract_reply() parses it robustly (incl. truncated JSON).
         }
 
-        # 1) Primary: OpenCode Zen — retry on empty/failed replies (free tier is flaky)
-        if settings.ZEN_API_KEY:
-            for attempt in range(3):
+        # Use ProviderPool for automatic rotation
+        pool = self.provider_pool
+        available = pool.get_available_providers()
+        if not available:
+            return "Sorry, I'm having trouble connecting right now. No LLM providers configured."
+
+        for provider_cfg in available:
+            payload = {**base_payload, "model": provider_cfg.model}
+            url = f"{provider_cfg.base_url}/chat/completions"
+
+            for attempt in range(provider_cfg.max_retries):
                 result = await self._call_provider(
-                    f"{self.zen_url}/chat/completions",
+                    url,
                     payload,
-                    settings.ZEN_API_KEY,
+                    provider_cfg.api_key,
+                    provider_cfg.extra_headers,
                 )
                 if result and result.strip():
+                    pool.record_success(provider_cfg.name)
                     return result
+
+                # Check if it's a rate limit error (429)
                 await asyncio.sleep(0.8 * (attempt + 1))
 
-        # 2) Fallback: OpenRouter
-        if settings.OPENROUTER_API_KEY:
-            or_payload = {**payload, "model": self.or_model}
-            result = await self._call_provider(
-                f"{self.or_url}/chat/completions",
-                or_payload,
-                settings.OPENROUTER_API_KEY,
-                extra_headers={
-                    "HTTP-Referer": "https://ceyloria-site.vercel.app",
-                    "X-Title": "Ceyloria Holidays Concierge",
-                },
-            )
-            if result and result.strip():
-                return result
+            # All retries exhausted for this provider
+            pool.record_failure(provider_cfg.name, "retries exhausted")
 
         return "Sorry, I'm having trouble connecting right now. Please try again."
 
@@ -355,6 +529,9 @@ class LLMChatEngine:
                     data = resp.json()
                     raw = data["choices"][0]["message"]["content"].strip()
                     return _extract_reply(raw)
+                # Handle rate limit explicitly
+                if resp.status_code == 429:
+                    logging.getLogger(__name__).warning(f"Rate limit (429) from {url}")
                 return None
         except Exception:
             return None

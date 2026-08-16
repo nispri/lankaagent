@@ -107,14 +107,17 @@ def _sse_or_json(text: str) -> dict[str, Any]:
     """FastMCP streamable-http replies with SSE frames (event: message / data:).
 
     Parse the first `data:` payload as JSON; fall back to plain JSON bodies.
+    Handles both `\n` and `\r\n` line endings.
     """
     try:
         return json.loads(text)
     except Exception:
         pass
+    # Normalize line endings first
+    normalized = text.replace("\r\n", "\n").replace("\r", "\n")
     data_lines = [
         line[6:].strip()
-        for line in text.splitlines()
+        for line in normalized.splitlines()
         if line.startswith("data:") and line[6:].strip()
     ]
     for raw in data_lines:
@@ -126,8 +129,13 @@ def _sse_or_json(text: str) -> dict[str, Any]:
 
 
 def _parse_tool_result(result: dict[str, Any]) -> dict[str, Any]:
-    """Extract a plain dict from an MCP tools/call result."""
-    structured = result.get("structured_content")
+    """Extract a plain dict from an MCP tools/call result.
+
+    Handles both snake_case (structured_content) and camelCase (structuredContent)
+    from different FastMCP versions.
+    """
+    # Try both casing conventions
+    structured = result.get("structured_content") or result.get("structuredContent")
     if isinstance(structured, dict):
         if "result" in structured:
             return structured["result"]
