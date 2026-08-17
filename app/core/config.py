@@ -72,6 +72,11 @@ class Settings(BaseSettings):
     META_PHONE_NUMBER_ID: str | None = None
     META_WABA_ID: str | None = None
 
+    # Clerk Authentication
+    CLERK_API_KEY: str | None = None
+    CLERK_PUBLISHABLE_KEY: str | None = None
+    CLERK_WEBHOOK_SECRET: str | None = None
+
     # Payments - Stripe
     STRIPE_SECRET_KEY: str | None = None
     STRIPE_PUBLISHABLE_KEY: str | None = None
@@ -108,6 +113,12 @@ class Settings(BaseSettings):
     OPENROUTER_API_KEY: str | None = None
     OPENROUTER_BASE_URL: str = "https://openrouter.ai/api/v1"
     OPENROUTER_MODEL: str = "deepseek/deepseek-chat-v3-0324"
+    OPENROUTER_FALLBACK_MODELS: list[str] = [
+        "anthropic/claude-3.5-sonnet",
+        "openai/gpt-4o",
+        "google/gemini-pro",
+        "meta-llama/llama-3.1-70b-instruct"
+    ]
     ZEN_API_KEY: str | None = None
     ZEN_BASE_URL: str = "https://opencode.ai/zen/v1"
     ZEN_MODEL: str = "deepseek-v4-flash-free"

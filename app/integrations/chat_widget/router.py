@@ -170,14 +170,44 @@ async def embed_widget(request: Request) -> HTMLResponse:  # noqa: ARG001
         }
 
         .chat-header-actions .voice-toggle.on svg {
-            color: #7CFC9A;
-        }
+                    color: #7CFC9A;
+                }
 
-        .chat-header-actions .voice-toggle:not(.on) svg {
-            color: rgba(255,255,255,0.4);
-        }
+                .chat-header-actions .voice-toggle:not(.on) svg {
+                    color: rgba(255,255,255,0.4);
+                }
 
-        .chat-messages {
+                /* Language selector dropdown */
+                .language-selector {
+                    position: absolute;
+                    top: 100%;
+                    right: 0;
+                    background: white;
+                    border: 1px solid #e0e0e0;
+                    border-radius: 8px;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+                    min-width: 160px;
+                    display: none;
+                    z-index: 10001;
+                    overflow: hidden;
+                    border-radius: 8px;
+                }
+
+                .language-selector.open { display: block; }
+
+                .language-option {
+                    padding: 10px 16px;
+                    cursor: pointer;
+                    font-size: 14px;
+                    color: #333;
+                    transition: background 0.15s;
+                }
+
+                .language-option:hover {
+                    background: #f5f5f5;
+                }
+
+                .chat-messages {
             flex: 1;
             overflow-y: auto;
             padding: 16px;
@@ -393,15 +423,26 @@ async def embed_widget(request: Request) -> HTMLResponse:  # noqa: ARG001
                         </svg>
                     </button>
                     <button id="closeChat" aria-label="Close chat">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <line x1="18" y1="6" x2="6" y2="18"></line>
-                            <line x1="6" y1="6" x2="18" y2="18"></line>
-                        </svg>
-                    </button>
-                </div>
-            </div>
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                                            </svg>
+                                        </button>
+                                    </div>
 
-            <div class="chat-messages" id="chatMessages">
+                                    <!-- Language Selector Dropdown -->
+                                    <div class="language-selector" id="languageSelector">
+                                        <div class="language-option" data-lang="en">🇬🇧 English</div>
+                                        <div class="language-option" data-lang="ru">🇷🇺 Русский</div>
+                                        <div class="language-option" data-lang="de">🇩🇪 Deutsch</div>
+                                        <div class="language-option" data-lang="fr">🇫🇷 Français</div>
+                                        <div class="language-option" data-lang="zh">🇨🇳 中文</div>
+                                        <div class="language-option" data-lang="si">🇱🇰 සිංහල</div>
+                                        <div class="language-option" data-lang="ta">🇱🇰 தமிழ்</div>
+                                    </div>
+                                </div>
+
+                                <div class="chat-messages" id="chatMessages">
                 <div class="message bot">
                     <div>Hello! 🇱🇰 Welcome to Ceyloria Holidays! How can I help you plan your Sri Lanka trip?</div>
                     <div class="message-time">Just now</div>
@@ -488,32 +529,66 @@ async def embed_widget(request: Request) -> HTMLResponse:  # noqa: ARG001
             }
 
             /* ── TEXT-TO-SPEECH (server-side Edge neural voice) ── */
-            const voiceToggleBtn = document.getElementById('voiceToggle');
-            let voiceOutputEnabled = true;   // default ON
-            let audioPlayer = new Audio();
+                        const voiceToggleBtn = document.getElementById('voiceToggle');
+                        let voiceOutputEnabled = true;   // default ON
+                        let audioPlayer = new Audio();
 
-            function speak(text, lang) {
-                if (!voiceOutputEnabled) return;
-                try {
-                    audioPlayer.pause();
-                    audioPlayer.src = '/widget/tts?text=' + encodeURIComponent(text) + '&language=' + encodeURIComponent(lang || 'en');
-                    audioPlayer.play().catch(e => console.warn('TTS play failed:', e));
-                } catch (e) {
-                    console.warn('TTS failed:', e);
-                }
-            }
+                        function speak(text, lang) {
+                            if (!voiceOutputEnabled) return;
+                            try {
+                                audioPlayer.pause();
+                                audioPlayer.src = '/widget/tts?text=' + encodeURIComponent(text) + '&language=' + encodeURIComponent(lang || 'en');
+                                audioPlayer.play().catch(e => console.warn('TTS play failed:', e));
+                            } catch (e) {
+                                console.warn('TTS failed:', e);
+                            }
+                        }
 
-            // Speaker toggle (header)
-            if (voiceToggleBtn) {
-                voiceToggleBtn.addEventListener('click', () => {
-                    voiceOutputEnabled = !voiceOutputEnabled;
-                    voiceToggleBtn.classList.toggle('on', voiceOutputEnabled);
-                    voiceToggleBtn.title = voiceOutputEnabled ? 'Voice replies: ON' : 'Voice replies: OFF';
-                    if (!voiceOutputEnabled) audioPlayer.pause();
-                });
-            }
+                        // Speaker toggle (header)
+                        if (voiceToggleBtn) {
+                            voiceToggleBtn.addEventListener('click', () => {
+                                voiceOutputEnabled = !voiceOutputEnabled;
+                                voiceToggleBtn.classList.toggle('on', voiceOutputEnabled);
+                                voiceToggleBtn.title = voiceOutputEnabled ? 'Voice replies: ON' : 'Voice replies: OFF';
+                                if (!voiceOutputEnabled) audioPlayer.pause();
+                            });
+                        }
 
-            function showTyping() {
+                        /* ── LANGUAGE SELECTOR ── */
+                        const langBtn = document.getElementById('languageBtn');
+                        const langSelector = document.getElementById('languageSelector');
+                        const langOptions = document.querySelectorAll('.language-option');
+
+                        if (langBtn && langSelector) {
+                            langBtn.addEventListener('click', (e) => {
+                                e.stopPropagation();
+                                langSelector.classList.toggle('open');
+                            });
+
+                            document.addEventListener('click', (e) => {
+                                if (!langSelector.contains(e.target) && e.target !== langBtn) {
+                                    langSelector.classList.remove('open');
+                                }
+                            });
+
+                            langOptions.forEach(opt => {
+                                opt.addEventListener('click', () => {
+                                    currentLanguage = opt.dataset.lang;
+                                    langSelector.classList.remove('open');
+                                    addSystemMessage('Language changed to ' + opt.textContent);
+                                });
+                            });
+                        }
+
+                        function addSystemMessage(content) {
+                            const div = document.createElement('div');
+                            div.className = 'message system';
+                            div.textContent = content;
+                            chatMessages.appendChild(div);
+                            chatMessages.scrollTop = chatMessages.scrollHeight;
+                        }
+
+                        function showTyping() {
                 typing.style.display = 'flex';
                 chatMessages.scrollTop = chatMessages.scrollHeight;
             }
@@ -712,9 +787,8 @@ async def chat_endpoint(message: dict) -> dict:
         history = history[-20:]
     await _save_history(session_id, history)
 
-    # Simple language detect for the widget label
-    lang = "ru" if any(ord(c) > 1024 for c in message_text) else "en"
-    return {"response": reply, "language": lang, "session_id": session_id}
+    # Return the language that was requested/used
+    return {"response": reply, "language": language, "session_id": session_id}
 
 
 @router.get("/config")

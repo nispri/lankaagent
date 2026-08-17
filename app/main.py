@@ -21,6 +21,7 @@ from app.core.middleware import (
     LoggingMiddleware,
     RateLimitMiddleware,
     TenantMiddleware,
+    TenantContextMiddleware,
 )
 from app.core.redis import redis_client
 from app.integrations.chat_widget.router import router as chat_widget_router
@@ -78,6 +79,13 @@ async def lifespan(app: FastAPI):  # noqa: ARG001
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
+    # Setup RLS policies
+    from app.core.database import setup_rls
+    try:
+        await setup_rls()
+    except Exception as e:
+        logger.warning("RLS setup failed (may already exist)", error=str(e))
+
     # Test Redis connection
     try:
         await redis_client.ping()
@@ -119,6 +127,7 @@ def create_app() -> FastAPI:
     )
     app.add_middleware(CorrelationIDMiddleware)
     app.add_middleware(LoggingMiddleware)
+    app.add_middleware(TenantContextMiddleware)  # Must be before TenantMiddleware
     app.add_middleware(TenantMiddleware)
     app.add_middleware(RateLimitMiddleware)
 

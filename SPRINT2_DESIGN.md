@@ -233,7 +233,7 @@ const config = await fetch(`/widget/${tenantSlug}/config`).then(r => r.json());
 ### 4.2 Embed Code (Per Tenant)
 ```html
 <!-- Tenant adds this to their site -->
-<script src="https://synthetic-flavor-boutique-zero.trycloudflare.com/widget/ceyloria/embed.js" async></script>
+<script src="https://insert-estimate-antiques-incl.trycloudflare.com/widget/ceyloria/embed.js" async></script>
 <div id="lankaagent-widget"></div>
 ```
 

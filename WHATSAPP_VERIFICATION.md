@@ -128,7 +128,7 @@ Buttons:
 | 3c | Submit message templates (Section 4) | ☐ |
 | 4 | Wait for Meta approval (2–4 weeks) | ☐ |
 | 5 | Test inbound/outbound messages | ☐ |
-| 6 | Configure webhook: `https://synthetic-flavor-boutique-zero.trycloudflare.com/webhook/whatsapp` | ☐ |
+| 6 | Configure webhook: `https://insert-estimate-antiques-incl.trycloudflare.com/webhook/whatsapp` | ☐ |
 | 7 | Test end-to-end: send "hello" → receive Anuki reply | ☐ |
 
 ---
@@ -137,7 +137,7 @@ Buttons:
 
 | Setting | Value |
 |---|---|
-| **Webhook URL** | `https://synthetic-flavor-boutique-zero.trycloudflare.com/webhook/whatsapp` |
+| **Webhook URL** | `https://insert-estimate-antiques-incl.trycloudflare.com/webhook/whatsapp` |
 | **HTTP Method** | POST |
 | **Content-Type** | application/json |
 | **Verify Token** | [Generate random string, save in Twilio + LankaAgent env] |
@@ -183,7 +183,7 @@ TWILIO_MESSAGING_SERVICE_SID=MGxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
 ```bash
 # Test webhook locally
-curl -X POST https://synthetic-flavor-boutique-zero.trycloudflare.com/webhook/whatsapp \
+curl -X POST https://insert-estimate-antiques-incl.trycloudflare.com/webhook/whatsapp \
   -H "Content-Type: application/json" \
   -d '{"From":"whatsapp:+94771234567","Body":"hello"}'
 

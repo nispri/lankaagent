@@ -270,54 +270,6 @@ DEFAULT_PROVIDER_POOL: list[ProviderConfig] = [
         base_url="https://opencode.ai/zen/v1",
         api_key=None,  # filled from settings at runtime
     ),
-    # Fallback 1: OpenRouter deepseek-chat-v3-0324 (free, good quality)
-    ProviderConfig(
-        name="or-deepseek-chat-v3",
-        provider="openrouter",
-        model="deepseek/deepseek-chat-v3-0324",
-        base_url="https://openrouter.ai/api/v1",
-        api_key=None,
-        extra_headers={
-            "HTTP-Referer": "https://ceyloria-site.vercel.app",
-            "X-Title": "Ceyloria Holidays Concierge",
-        },
-    ),
-    # Fallback 2: OpenRouter Llama 3.1 8B (free, fast)
-    ProviderConfig(
-        name="or-llama-3.1-8b",
-        provider="openrouter",
-        model="meta-llama/llama-3.1-8b-instruct:free",
-        base_url="https://openrouter.ai/api/v1",
-        api_key=None,
-        extra_headers={
-            "HTTP-Referer": "https://ceyloria-site.vercel.app",
-            "X-Title": "Ceyloria Holidays Concierge",
-        },
-    ),
-    # Fallback 3: OpenRouter Gemma 2 9B (free, good for chat)
-    ProviderConfig(
-        name="or-gemma-2-9b",
-        provider="openrouter",
-        model="google/gemma-2-9b-it:free",
-        base_url="https://openrouter.ai/api/v1",
-        api_key=None,
-        extra_headers={
-            "HTTP-Referer": "https://ceyloria-site.vercel.app",
-            "X-Title": "Ceyloria Holidays Concierge",
-        },
-    ),
-    # Fallback 4: OpenRouter Phi-3 Mini (free, 128k context)
-    ProviderConfig(
-        name="or-phi-3-mini",
-        provider="openrouter",
-        model="microsoft/phi-3-mini-128k-instruct:free",
-        base_url="https://openrouter.ai/api/v1",
-        api_key=None,
-        extra_headers={
-            "HTTP-Referer": "https://ceyloria-site.vercel.app",
-            "X-Title": "Ceyloria Holidays Concierge",
-        },
-    ),
 ]
 
 
@@ -332,15 +284,43 @@ class ProviderPool:
         self._initialize_pool()
 
     def _initialize_pool(self) -> None:
-        """Fill in API keys from settings and create state objects."""
-        for cfg in self.pool:
-            if cfg.provider == "zen":
-                cfg.api_key = self.settings.ZEN_API_KEY
-                cfg.base_url = self.settings.ZEN_BASE_URL or cfg.base_url
-            elif cfg.provider == "openrouter":
-                cfg.api_key = self.settings.OPENROUTER_API_KEY
-                cfg.base_url = self.settings.OPENROUTER_BASE_URL or cfg.base_url
-            self._states[cfg.name] = ProviderState(config=cfg)
+            """Fill in API keys from settings and create state objects.
+
+            Dynamically builds the provider pool from settings:
+            - Zen (if ZEN_API_KEY configured)
+            - OpenRouter models from OPENROUTER_FALLBACK_MODELS
+            """
+            self.pool = []
+
+            # Primary: OpenCode Zen (if configured)
+            if self.settings.ZEN_API_KEY:
+                self.pool.append(ProviderConfig(
+                    name="zen-deepseek-v4",
+                    provider="zen",
+                    model=self.settings.ZEN_MODEL or "deepseek-v4-flash-free",
+                    base_url=self.settings.ZEN_BASE_URL or "https://opencode.ai/zen/v1",
+                    api_key=self.settings.ZEN_API_KEY,
+                ))
+
+            # OpenRouter fallbacks (if OPENROUTER_API_KEY configured)
+            if self.settings.OPENROUTER_API_KEY:
+                for model in self.settings.OPENROUTER_FALLBACK_MODELS:
+                    self.pool.append(ProviderConfig(
+                        name=f"or-{model.replace('/', '-').replace(':', '-')}",
+                        provider="openrouter",
+                        model=model,
+                        base_url=self.settings.OPENROUTER_BASE_URL or "https://openrouter.ai/api/v1",
+                        api_key=self.settings.OPENROUTER_API_KEY,
+                        extra_headers={
+                            "HTTP-Referer": "https://ceyloria-site.vercel.app",
+                            "X-Title": "Ceyloria Holidays Concierge",
+                        },
+                    ))
+
+            # Initialize state for each provider
+            self._states = {}
+            for cfg in self.pool:
+                self._states[cfg.name] = ProviderState(config=cfg)
 
     @property
     def current(self) -> ProviderConfig:
