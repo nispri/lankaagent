@@ -1,21 +1,26 @@
-"""Tenant and User models with Row Level Security."""
+"""Tenant and User models with Row Level Security - Single source of truth for all models."""
 
 import uuid
 from datetime import datetime
 from typing import Optional, List
 
-from sqlalchemy import Column, String, Text, DateTime, Boolean, ForeignKey, Integer, Index
+from sqlalchemy import Column, String, Text, DateTime, Boolean, ForeignKey, Integer, Index, Float, Date
 from sqlalchemy.dialects.postgresql import UUID, JSONB
-from sqlalchemy.orm import relationship, declarative_base
+from sqlalchemy.orm import relationship
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import Base
 
 
+# ─────────────────────────────────────────────────────────────
+# Core Models
+# ─────────────────────────────────────────────────────────────
+
 class Tenant(Base):
     """Tenant model with Row Level Security support."""
     __tablename__ = "tenants"
+    __table_args__ = {'extend_existing': True}
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     slug = Column(String(100), unique=True, nullable=False, index=True)
@@ -27,12 +32,16 @@ class Tenant(Base):
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
 
-    # Relationships
-    users = relationship("User", back_populates="tenant", cascade="all, delete-orphan")
-    tours = relationship("Tour", back_populates="tenant", cascade="all, delete-orphan")
-    hotels = relationship("Hotel", back_populates="tenant", cascade="all, delete-orphan")
-    leads = relationship("Lead", back_populates="tenant", cascade="all, delete-orphan")
-    conversations = relationship("Conversation", back_populates="tenant", cascade="all, delete-orphan")
+    # Relationships - use fully qualified paths matching the module where defined
+    users = relationship("app.models.tenant.User", back_populates="tenant", cascade="all, delete-orphan")
+    tours = relationship("app.models.tenant.Tour", back_populates="tenant", cascade="all, delete-orphan")
+    hotels = relationship("app.models.tenant.Hotel", back_populates="tenant", cascade="all, delete-orphan")
+    leads = relationship("app.models.tenant.Lead", back_populates="tenant", cascade="all, delete-orphan")
+    conversations = relationship("app.models.tenant.Conversation", back_populates="tenant", cascade="all, delete-orphan")
+    itineraries = relationship("app.models.tenant.Itinerary", back_populates="tenant", cascade="all, delete-orphan")
+    bookings = relationship("app.models.tenant.Booking", back_populates="tenant", cascade="all, delete-orphan")
+    payments = relationship("app.models.tenant.Payment", back_populates="tenant", cascade="all, delete-orphan")
+    wellness_protocols = relationship("app.models.tenant.WellnessProtocol", back_populates="tenant", cascade="all, delete-orphan")
 
     def __repr__(self):
         return f"<Tenant(slug='{self.slug}', name='{self.name}')>"
@@ -41,6 +50,10 @@ class Tenant(Base):
 class User(Base):
     """User model with tenant association and Clerk integration."""
     __tablename__ = "users"
+    __table_args__ = (
+        Index("ix_users_tenant_email", "tenant_id", "email"),
+        {'extend_existing': True}
+    )
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     clerk_id = Column(String(100), unique=True, nullable=False, index=True)
@@ -53,13 +66,8 @@ class User(Base):
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
 
-    # Relationships
-    tenant = relationship("Tenant", back_populates="users")
-
-    # Composite index for tenant + email lookups
-    __table_args__ = (
-        Index("ix_users_tenant_email", "tenant_id", "email"),
-    )
+    # Relationships - use fully qualified path
+    tenant = relationship("app.models.tenant.Tenant", back_populates="users")
 
     def __repr__(self):
         return f"<User(email='{self.email}', tenant_id='{self.tenant_id}', role='{self.role}')>"
@@ -72,6 +80,10 @@ class User(Base):
 class Tour(Base):
     """Tour model scoped to tenant."""
     __tablename__ = "tours"
+    __table_args__ = (
+        Index("ix_tours_tenant_slug", "tenant_id", "slug", unique=True),
+        {'extend_existing': True}
+    )
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     tenant_id = Column(UUID(as_uuid=True), ForeignKey("tenants.id", ondelete="CASCADE"), nullable=False, index=True)
@@ -90,17 +102,16 @@ class Tour(Base):
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
 
-    # Relationships
-    tenant = relationship("Tenant", back_populates="tours")
-
-    __table_args__ = (
-        Index("ix_tours_tenant_slug", "tenant_id", "slug", unique=True),
-    )
+    tenant = relationship("app.models.tenant.Tenant", back_populates="tours")
 
 
 class Hotel(Base):
     """Hotel model scoped to tenant."""
     __tablename__ = "hotels"
+    __table_args__ = (
+        Index("ix_hotels_tenant_slug", "tenant_id", "slug", unique=True),
+        {'extend_existing': True}
+    )
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     tenant_id = Column(UUID(as_uuid=True), ForeignKey("tenants.id", ondelete="CASCADE"), nullable=False, index=True)
@@ -121,16 +132,13 @@ class Hotel(Base):
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
 
-    tenant = relationship("Tenant", back_populates="hotels")
-
-    __table_args__ = (
-        Index("ix_hotels_tenant_slug", "tenant_id", "slug", unique=True),
-    )
+    tenant = relationship("app.models.tenant.Tenant", back_populates="hotels")
 
 
 class Lead(Base):
     """Lead model scoped to tenant."""
     __tablename__ = "leads"
+    __table_args__ = {'extend_existing': True}
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     tenant_id = Column(UUID(as_uuid=True), ForeignKey("tenants.id", ondelete="CASCADE"), nullable=False, index=True)
@@ -152,12 +160,17 @@ class Lead(Base):
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
     last_contact_at = Column(DateTime, nullable=True)
 
-    tenant = relationship("Tenant", back_populates="leads")
+    tenant = relationship("app.models.tenant.Tenant", back_populates="leads")
+    assigned_user = relationship("app.models.tenant.User", foreign_keys="app.models.tenant.Lead.assigned_to")
+    itineraries = relationship("app.models.tenant.Itinerary", back_populates="lead")
+    bookings = relationship("app.models.tenant.Booking", back_populates="lead")
+    wellness_protocols = relationship("app.models.tenant.WellnessProtocol", back_populates="lead")
 
 
 class Conversation(Base):
     """Conversation model scoped to tenant."""
     __tablename__ = "conversations"
+    __table_args__ = {'extend_existing': True}
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     tenant_id = Column(UUID(as_uuid=True), ForeignKey("tenants.id", ondelete="CASCADE"), nullable=False, index=True)
@@ -171,7 +184,127 @@ class Conversation(Base):
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
     closed_at = Column(DateTime, nullable=True)
 
-    tenant = relationship("Tenant", back_populates="conversations")
+    tenant = relationship("app.models.tenant.Tenant", back_populates="conversations")
+
+
+class Message(Base):
+    """Individual message within a conversation"""
+    __tablename__ = "messages"
+    __table_args__ = {'extend_existing': True}
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    conversation_id = Column(UUID(as_uuid=True), ForeignKey("conversations.id", ondelete="CASCADE"), nullable=False)
+    role = Column(String(50), nullable=False)
+    content = Column(Text, nullable=False)
+    tool_calls = Column(JSONB)
+    tool_results = Column(JSONB)
+    tokens_used = Column(Integer)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+
+class Itinerary(Base):
+    """Generated travel itinerary/quote"""
+    __tablename__ = "itineraries"
+    __table_args__ = {'extend_existing': True}
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    tenant_id = Column(UUID(as_uuid=True), ForeignKey("tenants.id", ondelete="CASCADE"), nullable=False)
+    lead_id = Column(UUID(as_uuid=True), ForeignKey("leads.id", ondelete="CASCADE"))
+    version = Column(Integer, default=1)
+    title = Column(String(255), nullable=False)
+    days = Column(JSONB, nullable=False)
+    total_price_usd = Column(Float(precision=2))
+    total_price_lkr = Column(Float(precision=2))
+    currency = Column(String(3), default="USD")
+    status = Column(String(50), default="draft")
+    valid_until = Column(DateTime, nullable=True)
+    created_by = Column(UUID(as_uuid=True), ForeignKey("users.id"))
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+
+    tenant = relationship("app.models.tenant.Tenant", back_populates="itineraries")
+    lead = relationship("app.models.tenant.Lead", back_populates="itineraries")
+
+
+class Booking(Base):
+    """Confirmed booking"""
+    __tablename__ = "bookings"
+    __table_args__ = {'extend_existing': True}
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    tenant_id = Column(UUID(as_uuid=True), ForeignKey("tenants.id", ondelete="CASCADE"), nullable=False)
+    lead_id = Column(UUID(as_uuid=True), ForeignKey("leads.id", ondelete="SET NULL"))
+    itinerary_id = Column(UUID(as_uuid=True), ForeignKey("itineraries.id", ondelete="SET NULL"))
+    booking_reference = Column(String(50), unique=True, nullable=False, index=True)
+    status = Column(String(50), default="confirmed")
+    travelers = Column(JSONB, nullable=False)
+    special_requests = Column(Text)
+    payment_status = Column(String(50), default="pending")
+    payment_intent_id = Column(String(255))
+    commission_usd = Column(Float(precision=2))
+    commission_lkr = Column(Float(precision=2))
+    starts_at = Column(Date, nullable=False)
+    ends_at = Column(Date, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+
+    tenant = relationship("app.models.tenant.Tenant", back_populates="bookings")
+    lead = relationship("app.models.tenant.Lead", back_populates="bookings")
+
+
+class Payment(Base):
+    """Payment transaction"""
+    __tablename__ = "payments"
+    __table_args__ = {'extend_existing': True}
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    tenant_id = Column(UUID(as_uuid=True), ForeignKey("tenants.id", ondelete="CASCADE"), nullable=False)
+    booking_id = Column(UUID(as_uuid=True), ForeignKey("bookings.id", ondelete="CASCADE"))
+    amount_usd = Column(Float(precision=2))
+    amount_lkr = Column(Float(precision=2))
+    currency = Column(String(3), nullable=False)
+    gateway = Column(String(50), nullable=False)
+    gateway_payment_id = Column(String(255))
+    gateway_response = Column(JSONB)
+    status = Column(String(50), default="pending")
+    fee_usd = Column(Float(precision=2))
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+    tenant = relationship("app.models.tenant.Tenant", back_populates="payments")
+
+
+class WellnessProtocol(Base):
+    """Ayurveda/wellness protocol for a lead"""
+    __tablename__ = "wellness_protocols"
+    __table_args__ = {'extend_existing': True}
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    tenant_id = Column(UUID(as_uuid=True), ForeignKey("tenants.id", ondelete="CASCADE"), nullable=False)
+    lead_id = Column(UUID(as_uuid=True), ForeignKey("leads.id", ondelete="CASCADE"))
+    health_intake = Column(JSONB, nullable=False)
+    recommended_treatments = Column(JSONB, nullable=False)
+    assigned_doctor_id = Column(UUID(as_uuid=True))
+    status = Column(String(50), default="proposed")
+    total_price_usd = Column(Float(precision=2))
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+
+    tenant = relationship("app.models.tenant.Tenant", back_populates="wellness_protocols")
+    lead = relationship("app.models.tenant.Lead", back_populates="wellness_protocols")
+
+
+class AnalyticsEvent(Base):
+    """Product analytics event"""
+    __tablename__ = "analytics_events"
+    __table_args__ = {'extend_existing': True}
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    tenant_id = Column(UUID(as_uuid=True), ForeignKey("tenants.id", ondelete="CASCADE"))
+    event_name = Column(String(255), nullable=False)
+    properties = Column(JSONB, default={})
+    user_id = Column(UUID(as_uuid=True))
+    session_id = Column(String(255))
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
 
 # ─────────────────────────────────────────────────────────────

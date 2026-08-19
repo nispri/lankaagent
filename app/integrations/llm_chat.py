@@ -7,6 +7,7 @@ import httpx
 import logging
 from app.core.config import settings
 from app.integrations.tour_pricing import quote_table
+from app.integrations.llm_usage import get_usage_tracker
 from data.tour_data import ATTRACTIONS, HOTELS, ITINERARY, TOUR_PRICING
 
 # ─────────────────────────────────────────────────────────────
@@ -284,43 +285,43 @@ class ProviderPool:
         self._initialize_pool()
 
     def _initialize_pool(self) -> None:
-            """Fill in API keys from settings and create state objects.
+        """Fill in API keys from settings and create state objects.
 
-            Dynamically builds the provider pool from settings:
-            - Zen (if ZEN_API_KEY configured)
-            - OpenRouter models from OPENROUTER_FALLBACK_MODELS
-            """
-            self.pool = []
+        Dynamically builds the provider pool from settings:
+        - Zen (if ZEN_API_KEY configured)
+        - OpenRouter models from OPENROUTER_FALLBACK_MODELS
+        """
+        self.pool = []
 
-            # Primary: OpenCode Zen (if configured)
-            if self.settings.ZEN_API_KEY:
+        # Primary: OpenCode Zen (if configured)
+        if self.settings.ZEN_API_KEY:
+            self.pool.append(ProviderConfig(
+                name="zen-deepseek-v4",
+                provider="zen",
+                model=self.settings.ZEN_MODEL or "deepseek-v4-flash-free",
+                base_url=self.settings.ZEN_BASE_URL or "https://opencode.ai/zen/v1",
+                api_key=self.settings.ZEN_API_KEY,
+            ))
+
+        # OpenRouter fallbacks (if OPENROUTER_API_KEY configured)
+        if self.settings.OPENROUTER_API_KEY:
+            for model in self.settings.OPENROUTER_FALLBACK_MODELS:
                 self.pool.append(ProviderConfig(
-                    name="zen-deepseek-v4",
-                    provider="zen",
-                    model=self.settings.ZEN_MODEL or "deepseek-v4-flash-free",
-                    base_url=self.settings.ZEN_BASE_URL or "https://opencode.ai/zen/v1",
-                    api_key=self.settings.ZEN_API_KEY,
+                    name=f"or-{model.replace('/', '-').replace(':', '-')}",
+                    provider="openrouter",
+                    model=model,
+                    base_url=self.settings.OPENROUTER_BASE_URL or "https://openrouter.ai/api/v1",
+                    api_key=self.settings.OPENROUTER_API_KEY,
+                    extra_headers={
+                        "HTTP-Referer": "https://ceyloria-site.vercel.app",
+                        "X-Title": "Ceyloria Holidays Concierge",
+                    },
                 ))
 
-            # OpenRouter fallbacks (if OPENROUTER_API_KEY configured)
-            if self.settings.OPENROUTER_API_KEY:
-                for model in self.settings.OPENROUTER_FALLBACK_MODELS:
-                    self.pool.append(ProviderConfig(
-                        name=f"or-{model.replace('/', '-').replace(':', '-')}",
-                        provider="openrouter",
-                        model=model,
-                        base_url=self.settings.OPENROUTER_BASE_URL or "https://openrouter.ai/api/v1",
-                        api_key=self.settings.OPENROUTER_API_KEY,
-                        extra_headers={
-                            "HTTP-Referer": "https://ceyloria-site.vercel.app",
-                            "X-Title": "Ceyloria Holidays Concierge",
-                        },
-                    ))
-
-            # Initialize state for each provider
-            self._states = {}
-            for cfg in self.pool:
-                self._states[cfg.name] = ProviderState(config=cfg)
+        # Initialize state for each provider
+        self._states = {}
+        for cfg in self.pool:
+            self._states[cfg.name] = ProviderState(config=cfg)
 
     @property
     def current(self) -> ProviderConfig:
@@ -352,6 +353,10 @@ class ProviderPool:
         state = self._states[name]
         state.consecutive_failures += 1
         state.last_failure_time = time.time()
+        # Rotate immediately on rate limit (429)
+        if "429" in reason or "rate_limit" in reason:
+            self._rotate(reason=f"{reason} (immediate rotate on 429)")
+            return True
         if state.consecutive_failures >= state.config.max_retries:
             self._rotate(reason=f"{reason} (retries exhausted)")
             return True
@@ -461,11 +466,14 @@ class LLMChatEngine:
 
         # Use ProviderPool for automatic rotation
         pool = self.provider_pool
-        available = pool.get_available_providers()
-        if not available:
-            return "Sorry, I'm having trouble connecting right now. No LLM providers configured."
 
-        for provider_cfg in available:
+        # Keep trying providers until we exhaust all or succeed
+        max_attempts = len(pool.get_available_providers())
+        for _ in range(max_attempts):
+            available = pool.get_available_providers()
+            if not available:
+                break
+            provider_cfg = available[0]  # Current provider is always first in available
             payload = {**base_payload, "model": provider_cfg.model}
             url = f"{provider_cfg.base_url}/chat/completions"
 
@@ -480,21 +488,28 @@ class LLMChatEngine:
                     pool.record_success(provider_cfg.name)
                     return result
 
-                # Check if it's a rate limit error (429)
+                # Check if it was a rate limit (429) - rotate IMMEDIATELY
+                # The _call_provider tracks 429 with error="rate_limit_429"
+                tracker = get_usage_tracker()
+                if tracker._records and tracker._records[-1].error == "rate_limit_429":
+                    pool.record_failure(provider_cfg.name, "rate_limit_429")
+                    break  # Break inner loop to rotate to next provider
+
                 await asyncio.sleep(0.8 * (attempt + 1))
 
-            # All retries exhausted for this provider
-            pool.record_failure(provider_cfg.name, "retries exhausted")
+            # All retries exhausted for this provider (or broke on 429)
+            if provider_cfg.name == pool.current_name:
+                pool.record_failure(provider_cfg.name, "retries exhausted")
 
         return "Sorry, I'm having trouble connecting right now. Please try again."
 
     async def _call_provider(
-        self,
-        url: str,
-        payload: dict,
-        api_key: str,
-        extra_headers: dict | None = None,
-    ) -> str | None:
+            self,
+            url: str,
+            payload: dict,
+            api_key: str,
+            extra_headers: dict | None = None,
+        ) -> str | None:
         """POST to a provider; return the extracted reply or None on any failure."""
         headers = {
             "Authorization": f"Bearer {api_key}",
@@ -508,12 +523,54 @@ class LLMChatEngine:
                 if resp.status_code == 200:
                     data = resp.json()
                     raw = data["choices"][0]["message"]["content"].strip()
+               
+                    # Track usage
+                    usage = data.get("usage", {})
+                    input_tokens = usage.get("prompt_tokens", 0)
+                    output_tokens = usage.get("completion_tokens", 0)
+                    model = payload.get("model", "unknown")
+                    provider = "openrouter" if "openrouter" in url else "zen"
+               
+                    tracker = get_usage_tracker()
+                    tracker.record(
+                        provider=provider,
+                        model=model,
+                        input_tokens=input_tokens,
+                        output_tokens=output_tokens,
+                        success=True,
+                    )
+               
                     return _extract_reply(raw)
                 # Handle rate limit explicitly
                 if resp.status_code == 429:
                     logging.getLogger(__name__).warning(f"Rate limit (429) from {url}")
+               
+                    # Track rate limit as a failure
+                    model = payload.get("model", "unknown")
+                    provider = "openrouter" if "openrouter" in url else "zen"
+                    tracker = get_usage_tracker()
+                    tracker.record(
+                        provider=provider,
+                        model=model,
+                        input_tokens=0,
+                        output_tokens=0,
+                        success=False,
+                        error="rate_limit_429",
+                    )
                 return None
-        except Exception:
+        except Exception as e:
+            # Track exception
+            model = payload.get("model", "unknown")
+            provider = "openrouter" if "openrouter" in url else "zen"
+            tracker = get_usage_tracker()
+            tracker.record(
+                provider=provider,
+                model=model,
+                input_tokens=0,
+                output_tokens=0,
+                success=False,
+                error=str(e)[:200],
+            )
             return None
 
 

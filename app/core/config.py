@@ -31,14 +31,14 @@ class Settings(BaseSettings):
     API_KEY_HEADER: str = "X-API-Key"
 
     # Database
-    DATABASE_URL: PostgresDsn = "postgresql://lankaagent:changeme@localhost:5432/lankaagent"
+    DATABASE_URL: PostgresDsn = "postgresql://lankaagent:lankaagent_dev_pass@postgres:5432/lankaagent"
     DB_POOL_SIZE: int = 10
     DB_MAX_OVERFLOW: int = 20
     DB_POOL_TIMEOUT: int = 30
     DB_POOL_RECYCLE: int = 3600
 
     # Redis
-    REDIS_URL: RedisDsn = "redis://localhost:6379/0"
+    REDIS_URL: RedisDsn = "redis://redis:6379/0"
     REDIS_MAX_CONNECTIONS: int = 50
     REDIS_DECODE_RESPONSES: bool = True
 
@@ -90,7 +90,7 @@ class Settings(BaseSettings):
     PAYHERE_WEBHOOK_URL: str | None = None
 
     # MCP Server
-    MCP_SERVER_URL: str = "http://localhost:8001"
+    MCP_SERVER_URL: str = "http://mcp:8000"
     MCP_API_KEY: str | None = None
 
     # Google Calendar
@@ -113,11 +113,22 @@ class Settings(BaseSettings):
     OPENROUTER_API_KEY: str | None = None
     OPENROUTER_BASE_URL: str = "https://openrouter.ai/api/v1"
     OPENROUTER_MODEL: str = "deepseek/deepseek-chat-v3-0324"
+    # Free models first (cost $0), then cost-effective paid models
+    # Ordered by capability for travel concierge tasks (reasoning, multilingual, instruction following)
     OPENROUTER_FALLBACK_MODELS: list[str] = [
-        "anthropic/claude-3.5-sonnet",
-        "openai/gpt-4o",
-        "google/gemini-pro",
-        "meta-llama/llama-3.1-70b-instruct"
+        # Tier 1: Best free models for complex reasoning & multilingual
+        "deepseek/deepseek-chat-v3-0324",           # Strong reasoning, 128k context
+        "google/gemma-2-27b-it:free",               # 27B params, excellent multilingual
+        "meta-llama/llama-3.1-8b-instruct:free",    # Solid all-rounder, good instruction following
+        # Tier 2: Lightweight but capable free models
+        "microsoft/phi-3-mini-128k-instruct:free",  # 128k context, good for long conversations
+        "google/gemma-2-9b-it:free",                # 9B params, decent multilingual
+        "meta-llama/llama-3.2-3b-instruct:free",    # Fast, basic capability
+        # Tier 3: Cost-effective paid models (only if ALL free exhausted)
+        "deepseek/deepseek-chat",                    # Best value paid: $0.14/$0.28 per 1K
+        "google/gemini-1.5-flash",                   # Fast, 1M context, $0.075/$0.30 per 1K
+        "anthropic/claude-3.5-haiku",                # Fast, $0.80/$4.00 per 1K
+        "meta-llama/llama-3.1-70b-instruct",         # 70B params, $0.59/$0.79 per 1K
     ]
     ZEN_API_KEY: str | None = None
     ZEN_BASE_URL: str = "https://opencode.ai/zen/v1"

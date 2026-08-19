@@ -834,18 +834,45 @@ async def speech_to_text(request: Request):
 
 @router.get("/{tenant_slug}", response_class=HTMLResponse)
 async def tenant_widget(request: Request, tenant_slug: str) -> HTMLResponse:
-    """Tenant-specific widget"""
-    return templates.TemplateResponse(
-        "widget_embed.html",
-        {
-            "request": request,
+    """Tenant-specific widget with dynamic branding from database."""
+    from app.core.database import async_session_factory
+    from app.models.tenant import get_tenant_by_slug
+    
+    async with async_session_factory() as db:
+        tenant = await get_tenant_by_slug(db, tenant_slug)
+        
+        if not tenant:
+            # Fallback to default if tenant not found
+            return templates.TemplateResponse(
+                request=request,
+                name="widget_embed.html",
+                context={
+                    "tenant_slug": tenant_slug,
+                    "api_base": "/api/v1",
+                    "widget_title": "Ceyloria Holidays",
+                    "widget_subtitle": "AI Travel Concierge",
+                    "welcome_message": "Hello! 🇱🇰 Welcome to Ceyloria Holidays! How can I help you plan your Sri Lanka trip?",
+                    "placeholder": "Type your message... or use the mic",
+                    "primary_color": "#e94560",
+                },
+            )
+        
+        branding = tenant.branding or {}
+        
+        # Extract individual values (without request - it goes as first param)
+        context = {
             "tenant_slug": tenant_slug,
             "api_base": "/api/v1",
-            "widget_title": "Ceyloria Holidays",
-            "widget_subtitle": "AI Travel Concierge",
-            "welcome_message": "Hello! 🇱🇰 Welcome to Ceyloria Holidays! How can I help you plan your Sri Lanka trip?",
-            "placeholder": "Type your message...",
-            "primary_color": "#e94560",
-        },
-    )
+            "widget_title": tenant.name,
+            "widget_subtitle": branding.get("subtitle", "AI Travel Concierge"),
+            "welcome_message": branding.get("welcome_message", f"Hello! 🇱🇰 Welcome to {tenant.name}! How can I help you plan your Sri Lanka trip?"),
+            "placeholder": branding.get("placeholder", "Type your message... or use the mic"),
+            "primary_color": branding.get("primary_color", "#e94560"),
+        }
+        
+        return templates.TemplateResponse(
+            request=request,
+            name="widget_embed.html",
+            context=context,
+        )
 
