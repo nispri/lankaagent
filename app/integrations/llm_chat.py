@@ -75,7 +75,7 @@ ABSOLUTE RULES:
 - NEVER reveal internal thoughts, analysis, or reasoning. NEVER narrate the conversation ("the user is asking...", "let me unpack...", "first, looking at the history..."). Speak ONLY the words you would say aloud to a guest standing in front of you.
 - If a guest's message is garbled, confusing, or unclear — STOP and ask a small clarifying question in plain, friendly words. NEVER guess or assume what they meant.
 - One short reply at a time. Never lecture, never repeat, never dump information.
-- OUTPUT FORMAT — STRICT JSON: Respond with ONLY a single JSON object, nothing else: {{"reply": "your spoken words here"}}. The "reply" value is exactly what you would say aloud to the guest — no analysis, no notes, no labels, no thinking. Example: {{"reply": "Good afternoon! How many travelers shall I plan for?"}}
+OUTPUT FORMAT — STRICT JSON: Respond with ONLY a single JSON object, nothing else: {{"reply": "your spoken words here"}}. The "reply" value is exactly what you would say aloud to the guest — no analysis, no notes, no labels, no thinking. Example: {{"reply": "Good afternoon! How many travelers shall I plan for?"}}
 
 HOW TO CONVERSE:
 1. Greet warmly and personally. If it's the first message, welcome them to Ceyloria Holidays.
@@ -326,7 +326,7 @@ class ProviderPool:
     @property
     def current(self) -> ProviderConfig:
         """Get the current provider config."""
-        return self.pool[self._current_idx].config
+        return self.pool[self._current_idx]
 
     @property
     def current_name(self) -> str:
@@ -470,10 +470,11 @@ class LLMChatEngine:
         # Keep trying providers until we exhaust all or succeed
         max_attempts = len(pool.get_available_providers())
         for _ in range(max_attempts):
-            available = pool.get_available_providers()
-            if not available:
-                break
-            provider_cfg = available[0]  # Current provider is always first in available
+            # Use the CURRENT provider (respects rotation index), not available[0]
+            provider_cfg = pool.current
+            if not provider_cfg.api_key:
+                pool._rotate(reason="no API key")
+                continue
             payload = {**base_payload, "model": provider_cfg.model}
             url = f"{provider_cfg.base_url}/chat/completions"
 
@@ -489,7 +490,6 @@ class LLMChatEngine:
                     return result
 
                 # Check if it was a rate limit (429) - rotate IMMEDIATELY
-                # The _call_provider tracks 429 with error="rate_limit_429"
                 tracker = get_usage_tracker()
                 if tracker._records and tracker._records[-1].error == "rate_limit_429":
                     pool.record_failure(provider_cfg.name, "rate_limit_429")
@@ -523,14 +523,14 @@ class LLMChatEngine:
                 if resp.status_code == 200:
                     data = resp.json()
                     raw = data["choices"][0]["message"]["content"].strip()
-               
+              
                     # Track usage
                     usage = data.get("usage", {})
                     input_tokens = usage.get("prompt_tokens", 0)
                     output_tokens = usage.get("completion_tokens", 0)
                     model = payload.get("model", "unknown")
                     provider = "openrouter" if "openrouter" in url else "zen"
-               
+              
                     tracker = get_usage_tracker()
                     tracker.record(
                         provider=provider,
@@ -539,12 +539,12 @@ class LLMChatEngine:
                         output_tokens=output_tokens,
                         success=True,
                     )
-               
+              
                     return _extract_reply(raw)
                 # Handle rate limit explicitly
                 if resp.status_code == 429:
                     logging.getLogger(__name__).warning(f"Rate limit (429) from {url}")
-               
+              
                     # Track rate limit as a failure
                     model = payload.get("model", "unknown")
                     provider = "openrouter" if "openrouter" in url else "zen"
