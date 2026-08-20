@@ -13,7 +13,7 @@
 
 > *"Darling, I've built an AI system that helps Ayurveda resorts and wellness centers get more international bookings automatically. It answers guests in their own language (Russian, German, Chinese), builds custom packages including your BIMARI protocols, and collects payments online — all while the operator sleeps.*
 > 
-> *Can you share 2-3 contacts of resort owners or wellness center directors who would be open to a 15-min demo this week? I want to give them free access for 3 months in exchange for feedback. Your credibility would mean a lot for the intro."*
+> *Can you share 2-3 contacts of resort owners or wellness center directors who would be open to a 15-min demo this week? I want to give them free access for 30 days in exchange for feedback. Your credibility would mean a lot for the intro."*
 
 ### Forward-Ready Message for Ayurveda Resort Owners
 
@@ -22,9 +22,9 @@ Hello [Name],
 
 I'm reaching out through [Wife's Name]'s network at BIMARI Naviina.
 
-I've built an AI-powered travel concierge that helps wellness resorts automatically convert international inquiries into confirmed bookings — 24/7, in 12 languages, including full Ayurveda package upsells integrated with BIMARI protocols.
+I've built an AI-powered travel concierge that helps wellness resorts automatically convert international inquiries into confirmed bookings — 24/7, in 7 languages, including full Ayurveda package upsells integrated with BIMARI protocols.
 
-We're looking for 3 pilot partners to get free access for 3 months (valued at $1,500/mo) in exchange for feedback.
+We're looking for 3 pilot partners to get free access for 30 days (valued at $199/mo) in exchange for feedback.
 
 Would you be open to a 15-minute demo this week?
 
@@ -36,7 +36,7 @@ Manager - Systems & DevOps, Kingslake
 
 ---
 
-## Channel 2: SLTDA Contacts (ICT Department)
+### Channel 2: SLTDA Contacts (ICT Department)
 
 **Strategy:** You already have connections at SLTDA ICT Dept (from your previous work with their systems/data). Pitch this as a solution that uses SLTDA data to help registered operators.
 
@@ -44,7 +44,7 @@ Manager - Systems & DevOps, Kingslake
 
 > *"Hi [Name], hope you're well. I've been working on something that directly helps SLTDA-registered operators — an AI concierge that uses SLTDA's tourism data to help them convert more inquiries into bookings, especially in international languages.*
 > 
-> *I'm looking for 2-3 progressive operators to pilot-test it for free. Would you be able to recommend any operators who frequently lose leads due to late responses or language barriers? Happy to give them the first 3 months free in exchange for structured feedback.*
+> *I'm looking for 2-3 progressive operators to pilot-test it for free. Would you be able to recommend any operators who frequently lose leads due to late responses or language barriers? Happy to give them the first 30 days free in exchange for structured feedback.*
 > 
 > *Would 15 minutes this week work to walk you through it?"*
 
@@ -55,7 +55,7 @@ Subject: AI-powered multilingual support for SLTDA-registered operators
 
 Dear [SLTDA Contact],
 
-I've developed an AI travel concierge platform that helps Sri Lanka tour operators respond to international inquiries 24/7 in 12 languages (English, Sinhala, Tamil, Russian, German, Chinese, French, Arabic + Japanese, Korean).
+I've developed an AI travel concierge platform that helps Sri Lanka tour operators respond to international inquiries 24/7 in 7 languages (English, Sinhala, Tamil, Russian, German, Chinese, French).
 
 The system:
 - Integrates with SLTDA's tourism data for accurate itineraries
@@ -63,7 +63,7 @@ The system:
 - Provides operators with a dashboard to track leads → bookings → revenue
 - Includes an Ayurveda/wellness add-on for licensed centers
 
-I'm offering complimentary 3-month pilots to 3 operators recommended by SLTDA as a way to showcase how technology can boost Sri Lanka's tourism revenue.
+I'm offering complimentary 30-day pilots to 3 operators recommended by SLTDA as a way to showcase how technology can boost Sri Lanka's tourism revenue.
 
 Would you be open to a quick 10-min call this week?
 
@@ -94,7 +94,7 @@ It handles:
 - Multi-currency payment collection
 - Calendar sync and automated reminders
 
-I'm offering complimentary 3-month pilots to select partners who want to test it with their corporate or leisure travel clients — no commitment, just feedback.
+I'm offering complimentary 30-day pilots to select partners who want to test it with their corporate or leisure travel clients — no commitment, just feedback.
 
 Would 15 minutes this week work for a quick walkthrough?
 
@@ -113,20 +113,20 @@ When they say "yes" — send this:
 ```
 LANKAAGENT — PILOT PARTNER AGREEMENT
 
-Term: 3 months (complimentary)
-Value: $1,500/month (waived for pilot)
+Term: 30 days (complimentary)
+Value: $199/month (waived for pilot)
 Includes:
-  - WhatsApp AI agent (24/7, 12 languages)
-  - Itinerary builder (auto-generated)
+  - Website widget embed (24/7, 7 languages)
+  - AI itinerary generator (MCP-grounded)
+  - Lead capture + dashboard
   - Payment collection (USD + LKR)
-  - Operator dashboard (leads, bookings, revenue)
-  - Wellness/Ayurveda add-on module
-  - Dedicated WhatsApp support during pilot
+  - Wellness/Ayurveda upsell module
+  - Dedicated support during pilot
 
 Expectations from partner:
   - 15-min onboarding call
   - Forward real inquiries to the system
-  - 30-min feedback call at weeks 2, 4, 8
+  - 30-min feedback call at weeks 1, 2, 4
   - Permission to use as case study (optional)
 
 Start date: [Date]
@@ -146,7 +146,7 @@ Start date: [Date]
 
 ---
 
-**Ready to go, Sir.** 
+**Ready to go, Sir.**
 - Copy-paste any message above → send via WhatsApp or email
 - When someone says "yes, tell me more" → forward the Pilot Agreement
 - When they confirm → tell Hermes "Pilot [Name] confirmed" → I onboard them into the system

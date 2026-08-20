@@ -23,12 +23,11 @@
 ### 2.1 Technical verification (5 min before call)
 ```bash
 # 1. Stack health
-curl -sf https://insert-estimate-antiques-incl.trycloudflare.com/health/ready
+curl -sf https://cycling-handwash-oversweet.ngrok-free.dev/health/ready
 docker ps --format "{{.Names}} | {{.Status}}" | grep -E "api|mcp|postgres|redis"
 
 # 2. Widget loads
-open https://insert-estimate-antiques-incl.trycloudflare.com/widget/embed
-# Click "Visit Site" once if Cloudflare interstitial appears
+open https://cycling-handwash-oversweet.ngrok-free.dev/widget/iframe/ceyloria-holidays
 
 # 3. MCP trace ready (separate terminal)
 docker logs -f lankaagent-mcp | grep "POST /mcp"
@@ -61,38 +60,38 @@ docker logs -f lankaagent-mcp | grep "POST /mcp"
 
 ---
 
-## 4. Live Demo Script (12 minutes — rehearsed)
+## 3. Live Demo Script (12 minutes — rehearsed)
 
 > **Principle:** Every click fires a real MCP tool call. Narrate the *business value*, not the tech.
 
-### 4.1 Opening (1 min)
-> "This is **Anuki** — your AI Travel Concierge. It runs on *your* data: your hotels, your pricing, your tours. It speaks 7 languages, works 24/7, and captures every lead into your dashboard. Let me show you."
+### 3.1 Opening (1 min)
+> *"This is **Anuki** — your AI Travel Concierge. It runs on *your* data: your hotels, your pricing, your tours. It speaks 7 languages, works 24/7, and captures every lead into your dashboard. Let me show you."*
 
-### 4.2 Demo Flow (click-by-click)
+### 3.2 Demo Flow (click-by-click)
 
 | Step | You type / click | MCP tool fired | Business value you narrate |
 |---|---|---|---|
-| **A. Quote** | `"quote a 7 day tour for 2 people"` | `get_tour_quote` | "Instant, accurate quote — **$1,261/pp**. No spreadsheet, no back-and-forth. Your margin (25.95%) baked in." |
-| **B. Customize** | `"make it 10 days for 4 people"` | `get_tour_quote` | "Any duration, any party size — engine recomputes in <2 sec. **$1,369/pp**." |
-| **C. Attractions** | `"what wildlife can we see?"` | `search_attractions` | "Guest asks 'what animals?' — Anuki answers from *your* attraction database with fees. Upsell opportunity." |
-| **D. Hotels** | `"hotels in Kandy"` | `get_hotels` | "Your contracted rates, your photos. Guest books *your* room block." |
-| **E. Visa** | `"do I need a visa from Germany?"` | `get_visa_requirements` | "One less email for your ops team. ETA $50, done." |
-| **F. Language switch** | Click 🌐 → **Deutsch** → repeat A | — | "7 languages. German guest gets **ab $1.261 pro Person** — same engine, zero translation work." |
-| **G. Voice (optional)** | Click 🎙️ → speak query | — | "Voice in/out. Accessibility + luxury feel." |
+| **A. Quote** | `"quote a 7 day tour for 2 people"` | `get_tour_quote` | *"Instant, accurate quote — **$1,261/pp**. No spreadsheet, no back-and-forth. Your margin (25.95%) baked in."* |
+| **B. Customize** | `"make it 10 days for 4 people"` | `get_tour_quote` | *"Any duration, any party size — engine recomputes in <2 sec. **$1,369/pp**."* |
+| **C. Attractions** | `"what wildlife can we see?"` | `search_attractions` | *"Guest asks 'what animals?' — Anuki answers from *your* attraction database with fees. Upsell opportunity."* |
+| **D. Hotels** | `"hotels in Kandy"` | `get_hotels` | *"Your contracted rates, your photos. Guest books *your* room block."* |
+| **E. Visa** | `"do I need a visa from Germany?"` | `get_visa_requirements` | *"One less email for your ops team. ETA $50, done."* |
+| **F. Language switch** | Click 🌐 → **Deutsch** → repeat A | — | *"7 languages. German guest gets **ab $1.261 pro Person** — same engine, zero translation work."* |
+| **G. Voice (optional)** | Click 🎙️ → speak query | — | *"Voice in/out. Accessibility + luxury feel."* |
 
 > **Pro tip:** After each reply, point to the MCP terminal: *"See? That was a real API call to your Tourism Server — not a canned response."*
 
-### 4.3 Channel-specific pivots
+### 3.3 Channel-specific pivots
 
 | Channel | Extra 2 minutes | Why |
 |---|---|---|
 | **BIMARI** | `"wellness add-on for 2 people"` → shows $580/pp | Wellness = your wife's domain = **15% revenue split** (new money line) |
-| **SLTDA ICT** | Show `/api/v1/leads` dashboard (admin) | "Association view: aggregate leads across members, compliance reporting" |
-| **Ceyloria Partners** | `"my tour is 5 days, 6 pax, budget $1,500"` → custom quote | "Your weird requests — engine handles any combo. No more 'let me check and revert'." |
+| **SLTDA ICT** | Show `/api/v1/leads` dashboard (admin) | *"Association view: aggregate leads across members, compliance reporting"* |
+| **Ceyloria Partners** | `"my tour is 5 days, 6 pax, budget $1,500"` → custom quote | *"Your weird requests — engine handles any combo. No more 'let me check and revert'."* |
 
 ---
 
-## 5. Pain-Point Mapping (5 minutes — diagnostic)
+## 4. Pain-Point Mapping (5 minutes — diagnostic)
 
 > **Ask:** *"Of these three, which costs you the most right now?"* (Show the card)
 
@@ -106,9 +105,9 @@ docker logs -f lankaagent-mcp | grep "POST /mcp"
 
 ---
 
-## 6. Pilot Terms & Close (5 minutes)
+## 5. Pilot Terms & Close (5 minutes)
 
-### 6.1 Standard Pilot Agreement (non-negotiable core)
+### 5.1 Standard Pilot Agreement (non-negotiable core)
 
 | Term | Value |
 |---|---|
@@ -121,7 +120,7 @@ docker logs -f lankaagent-mcp | grep "POST /mcp"
 | **Exit** | 30-day notice, data export in CSV/JSON |
 | **Reference** | Willing to take 1 reference call from future pilot |
 
-### 6.2 Channel-specific add-ons
+### 5.2 Channel-specific add-ons
 
 | Channel | Add-on |
 |---|---|
@@ -129,12 +128,12 @@ docker logs -f lankaagent-mcp | grep "POST /mcp"
 | **SLTDA ICT** | Association dashboard (aggregate view) — *co-branded "Powered by LankaAgent + SLTDA"* |
 | **Ceyloria Partners** | White-label widget (their logo, their domain, their Stripe) |
 
-### 6.3 Closing line
+### 5.3 Closing line
 > "We're taking 3 pilots total. You're [#1/#2/#3]. The agreement is 2 pages. If the success metric hits in 30 days, we both win. Shall I send the DocuSign now and schedule onboarding for [Tuesday/Thursday]?"
 
 ---
 
-## 7. Onboarding Checklist (post-signature, Day 1–7)
+## 6. Onboarding Checklist (post-signature, Day 1–7)
 
 | Day | Task | Owner | Done? |
 |---|---|---|---|
@@ -150,7 +149,7 @@ docker logs -f lankaagent-mcp | grep "POST /mcp"
 
 ---
 
-## 8. Objection Handling (ready responses)
+## 7. Objection Handling (ready responses)
 
 | Objection | Response |
 |---|---|
@@ -162,7 +161,7 @@ docker logs -f lankaagent-mcp | grep "POST /mcp"
 
 ---
 
-## 9. Post-Call Actions (within 1 hour)
+## 8. Post-Call Actions (within 1 hour)
 
 1. **Email** with: Pilot Agreement (DocuSign), this playbook (PDF), pricing one-pager, onboarding calendar link.
 2. **Slack/WhatsApp group** created: "LankaAgent Pilot — [Partner Name]" — you + pilot ops + pilot owner.
@@ -171,7 +170,7 @@ docker logs -f lankaagent-mcp | grep "POST /mcp"
 
 ---
 
-## 10. Success Metrics (pilot cohort level)
+## 9. Success Metrics (pilot cohort level)
 
 | Metric | Target (90 days) |
 |---|---|
@@ -188,11 +187,11 @@ docker logs -f lankaagent-mcp | grep "POST /mcp"
 
 | Asset | URL |
 |---|---|
-| **Widget demo** | `https://insert-estimate-antiques-incl.trycloudflare.com/widget/embed` |
+| **Widget demo (Ceyloria)** | `https://cycling-handwash-oversweet.ngrok-free.dev/widget/iframe/ceyloria-holidays` |
 | **Ceyloria landing (customer view)** | `https://ceyloria-site.vercel.app` |
 | **Pilot Agreement template** | `PILOT-OUTREACH.md` (Appendix A) |
 | **Pricing one-pager** | `REVENUE-PLAN.md` § Pricing Tiers |
-| **MCP tool trace (live)** | `docker logs -f lankaagent-mcp \| grep "POST /mcp"` |
+| **MCP tool trace (live)** | `docker logs -f lankaagent-mcp | grep "POST /mcp"` |
 | **Google Sheet (Pilot Leads)** | `https://docs.google.com/spreadsheets/d/16e3EFOkIbyc3a8xG23D61MWVQEAtTNrvh2RAxHWfS2o` |
 | **Onboarding calendar** | (add your Calendly/Cal.com link) |
 
