@@ -406,20 +406,30 @@ class LLMChatEngine:
     def __init__(self):
         self.provider_pool = ProviderPool(settings)
         self.knowledge = build_knowledge_base()
-        self.system = SYSTEM_PROMPT.format(knowledge=self.knowledge)
+
+    def _build_system_prompt(self, tenant_context: str | None = None) -> str:
+        """Build system prompt with optional tenant context."""
+        base_prompt = SYSTEM_PROMPT.format(knowledge=self.knowledge)
+        if tenant_context:
+            # Prepend tenant-specific identity
+            tenant_prompt = f"{tenant_context}\n\n---\n\n{base_prompt}"
+            return tenant_prompt
+        return base_prompt
 
     async def chat(
         self,
         message: str,
         language: str = "en",
         history: list[dict[str, str]] | None = None,
+        tenant_context: str | None = None,
     ) -> str:
         """Send message to the LLM with tour knowledge + conversation history.
 
         Uses ProviderPool for automatic free-model rotation on rate limits/errors.
         """
         # Build conversation messages: system + history + current
-        messages = [{"role": "system", "content": self.system}]
+        system_prompt = self._build_system_prompt(tenant_context)
+        messages = [{"role": "system", "content": system_prompt}]
         if history:
             for turn in history[-6:]:  # keep last 6 turns of context
                 if turn.get("role") in ("user", "assistant") and turn.get("content"):

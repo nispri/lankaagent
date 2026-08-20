@@ -168,3 +168,49 @@ async def update_tenant_settings(
     await db.refresh(tenant)
 
     return {"message": "Settings updated successfully", "settings": tenant.settings}
+
+
+class TenantCreate(BaseModel):
+    """Create new tenant."""
+    slug: str
+    name: str
+    domain: str | None = None
+    branding: dict | None = None
+    settings: dict | None = None
+
+
+@router.post("", tags=["Tenants"], status_code=status.HTTP_201_CREATED)
+async def create_tenant_endpoint(
+    tenant_data: TenantCreate,
+    db: AsyncSession = Depends(get_session)
+):
+    """Create a new tenant."""
+    from app.models import create_tenant as create_tenant_func
+    
+    # Check if slug exists
+    existing = await get_tenant_by_slug(db, tenant_data.slug)
+    if existing:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=f"Tenant with slug '{tenant_data.slug}' already exists"
+        )
+    
+    tenant = await create_tenant_func(
+        db=db,
+        slug=tenant_data.slug,
+        name=tenant_data.name,
+        domain=tenant_data.domain,
+        branding=tenant_data.branding or {},
+        settings=tenant_data.settings or {},
+    )
+    
+    return {
+        "id": str(tenant.id),
+        "slug": tenant.slug,
+        "name": tenant.name,
+        "domain": tenant.domain,
+        "branding": tenant.branding,
+        "settings": tenant.settings,
+        "is_active": tenant.is_active,
+        "created_at": str(tenant.created_at),
+    }

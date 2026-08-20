@@ -47,6 +47,7 @@ class ChatMessage(BaseModel):
     message: str
     language: str = "en"
     session_id: str | None = None
+    tenant_slug: str | None = None
 
 
 class ChatResponse(BaseModel):
@@ -207,7 +208,7 @@ async def embed_widget(request: Request) -> HTMLResponse:  # noqa: ARG001
                     background: #f5f5f5;
                 }
 
-                .chat-messages {
+        .chat-messages {
             flex: 1;
             overflow-y: auto;
             padding: 16px;
@@ -497,222 +498,8 @@ async def embed_widget(request: Request) -> HTMLResponse:  # noqa: ARG001
                 tenantSlug: 'ceyloria-holidays',
                 primaryColor: '#e94560',
                 welcomeMessage: 'Hello! 🇱🇰 Welcome to Ceyloria Holidays! How can I help you plan your Sri Lanka trip?',
-                placeholder: 'Type your message... or use the mic',
-                voiceOutput: true
-            };
-
-            let sessionId = 'session_' + Math.random().toString(36).substr(2, 9);
-            let currentLanguage = 'en';
-            let isProcessing = false;
-            let voiceOutputEnabled = true;
-            let audioPlayer = new Audio();
-
-            function addMessage(content, isUser = false, lang = 'en') {
-                const div = document.createElement('div');
-                div.className = 'message ' + (isUser ? 'user' : 'bot');
-                const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-                div.innerHTML = content + (isUser ? '' : '<div class="message-time">' + lang.toUpperCase() + ' • ' + time + '</div>');
-                messages.appendChild(div);
-                messages.scrollTop = messages.scrollHeight;
-                if (!isUser && voiceOutputEnabled) {
-                    speak(content, lang);
-                }
-            }
-
-            function addSystemMessage(content) {
-                const div = document.createElement('div');
-                div.className = 'message system';
-                div.textContent = content;
-                messages.appendChild(div);
-                messages.scrollTop = messages.scrollHeight;
-            }
-
-            function showTyping() {
-                typing.style.display = 'flex';
-                messages.scrollTop = messages.scrollHeight;
-            }
-
-            function hideTyping() {
-                typing.style.display = 'none';
-            }
-
-            function speak(text, lang) {
-                if (!voiceOutputEnabled) return;
-                try {
-                    audioPlayer.pause();
-                    audioPlayer.src = '/widget/tts?text=' + encodeURIComponent(text) + '&language=' + encodeURIComponent(lang || 'en');
-                    audioPlayer.play().catch(e => console.warn('TTS play failed:', e));
-                } catch (e) {
-                    console.warn('TTS failed:', e);
-                }
-            }
-
-            async function sendMessage() {
-                const text = input.value.trim();
-                if (!text || isProcessing) return;
-
-                isProcessing = true;
-                sendBtn.disabled = true;
-                input.value = '';
-                input.style.height = 'auto';
-
-                addMessage(text, true, currentLanguage);
-                showTyping();
-
-                try {
-                    const response = await fetch(config.apiBase + '/chat', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            message: text,
-                            language: currentLanguage,
-                            session_id: sessionId
-                        })
-                    });
-
-                    if (!response.ok) {
-                        throw new Error('Server error: ' + response.status);
-                    }
-
-                    const data = await response.json();
-                    hideTyping();
-                    addMessage(data.response, false, data.language);
-                    sessionId = data.session_id || sessionId;
-
-                } catch (error) {
-                    hideTyping();
-                    addMessage('Sorry, something went wrong. Please try again.', false, 'en');
-                    console.error('Chat error:', error);
-                } finally {
-                    isProcessing = false;
-                    sendBtn.disabled = false;
-                    input.focus();
-                }
-            }
-
-            sendBtn.addEventListener('click', sendMessage);
-
-            input.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    sendMessage();
-                }
-            });
-
-            input.addEventListener('input', () => {
-                input.style.height = 'auto';
-                input.style.height = Math.min(input.scrollHeight, 120) + 'px';
-            });
-
-            // Voice toggle
-            const voiceToggleBtn = document.getElementById('voiceToggle');
-            if (voiceToggleBtn) {
-                voiceToggleBtn.addEventListener('click', () => {
-                    voiceOutputEnabled = !voiceOutputEnabled;
-                    voiceToggleBtn.classList.toggle('on', voiceOutputEnabled);
-                    voiceToggleBtn.title = voiceOutputEnabled ? 'Voice replies: ON' : 'Voice replies: OFF';
-                    if (!voiceOutputEnabled) audioPlayer.pause();
-                });
-            }
-
-            // Language selector
-            const langBtn = document.getElementById('languageBtn');
-            const langSelector = document.getElementById('languageSelector');
-            const langOptions = document.querySelectorAll('.language-option');
-
-            if (langBtn && langSelector) {
-                langBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    langSelector.classList.toggle('open');
-                });
-
-                document.addEventListener('click', (e) => {
-                    if (!langSelector.contains(e.target) && e.target !== langBtn) {
-                        langSelector.classList.remove('open');
-                    }
-                });
-
-                langOptions.forEach(opt => {
-                    opt.addEventListener('click', () => {
-                        currentLanguage = opt.dataset.lang;
-                        langSelector.classList.remove('open');
-                        addSystemMessage('Language changed to ' + opt.textContent);
-                    });
-                });
-            }
-
-            // Speech-to-text (mic button)
-            let mediaRecorder = null;
-            let audioChunks = [];
-
-            const micButton = document.getElementById('micButton');
-            if (micButton) {
-                micButton.addEventListener('click', async () => {
-                    if (mediaRecorder && mediaRecorder.state === 'recording') {
-                        mediaRecorder.stop();
-                        return;
-                    }
-
-                    try {
-                        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                        mediaRecorder = new MediaRecorder(stream);
-                        audioChunks = [];
-
-                        mediaRecorder.ondataavailable = e => {
-                            if (e.data.size > 0) audioChunks.push(e.data);
-                        };
-
-                        mediaRecorder.onstop = async () => {
-                            micButton.classList.remove('listening');
-                            const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-                            const formData = new FormData();
-                            formData.append('audio', audioBlob, 'recording.webm');
-
-                            try {
-                                const sttResponse = await fetch('/widget/stt?language=' + currentLanguage, {
-                                    method: 'POST',
-                                    body: formData
-                                });
-                                const sttData = await sttResponse.json();
-                                if (sttData.text) {
-                                    input.value = sttData.text;
-                                    input.style.height = 'auto';
-                                    input.style.height = Math.min(input.scrollHeight, 120) + 'px';
-                                    input.focus();
-                                }
-                            } catch (e) {
-                                console.error('STT error:', e);
-                            }
-                        };
-
-                        mediaRecorder.start();
-                        micButton.classList.add('listening');
-                    } catch (e) {
-                        console.warn('Mic access denied:', e);
-                        addSystemMessage('Microphone access denied. Please enable in browser settings.');
-                    }
-                });
-            }
-
-            // Focus input on load
-            input.focus();
-        })();
-    </script>
-</body>
-</html>
-"""
+    """
     return HTMLResponse(content=html_content)
-
-
-@router.get("/config")
-async def widget_config() -> dict:
-    """Widget configuration"""
-    return {
-        "api_base": "/widget",
-        "widget_endpoint": "/widget/chat",
-        "supported_languages": ["en", "ru", "de", "fr", "zh", "si", "ta"],
-        "default_language": "en",
-    }
 
 
 @router.get("/iframe/{tenant_slug}", response_class=HTMLResponse)
@@ -818,8 +605,26 @@ async def chat_endpoint(message: ChatMessage):
     session_id = message.session_id or f"session_{int(__import__('time').time())}"
     history = await _load_history(session_id)
 
-    # Get response from engine
-    result = await engine.chat(message.message, message.language, history)
+    # Build tenant-aware system context if tenant_slug provided
+    tenant_context = None
+    if message.tenant_slug:
+        async with async_session_factory() as db:
+            tenant = await get_tenant_by_slug(db, message.tenant_slug)
+            if tenant:
+                branding = tenant.branding or {}
+                company_name = tenant.name
+                welcome_msg = branding.get("welcome_message", f"Hello! 🇱🇰 Welcome to {company_name}! How can I help you plan your Sri Lanka trip?")
+                tenant_context = f"You are the AI concierge for {company_name}. {welcome_msg} Your responses should reflect this brand identity."
+
+    # Get response from engine with tenant context
+    if tenant_context and history and history[0].get("role") == "system":
+        # Replace existing system message
+        history[0]["content"] = tenant_context
+    elif tenant_context:
+        # Prepend system context
+        history = [{"role": "system", "content": tenant_context}] + history
+
+    result = await engine.chat(message.message, message.language, history, tenant_context=tenant_context)
 
     # Save updated history
     new_history = history + [
@@ -846,3 +651,37 @@ async def speech_to_text(request: Request):
         logger = __import__("logging").getLogger("lankaagent")
         logger.exception("STT failed")
         return {"text": "", "confidence": 0.0, "clear": False, "error": "transcription_failed"}
+
+
+@router.post("/tts")
+async def text_to_speech(request: Request):
+    """Convert text to speech audio."""
+    import json as _json
+    body = await request.body()
+    try:
+        data = _json.loads(body) if body else {}
+    except Exception:
+        data = {}
+    text = data.get("text", "")
+    language = data.get("language", "en")
+    if not text:
+        return {"audio_url": "", "error": "no_text"}
+    try:
+        from app.integrations.voice import synthesize
+        audio_url = await synthesize(text, language)
+        return {"audio_url": audio_url}
+    except Exception:
+        logger = __import__("logging").getLogger("lankaagent")
+        logger.exception("TTS failed")
+        return {"audio_url": "", "error": "synthesis_failed"}
+
+
+@router.get("/config")
+async def widget_config():
+    """Widget configuration endpoint."""
+    return {
+        "api_base": "/widget",
+        "widget_endpoint": "/widget/chat",
+        "supported_languages": ["en", "ru", "de", "fr", "zh", "si", "ta"],
+        "default_language": "en",
+    }
