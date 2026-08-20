@@ -21,8 +21,8 @@ from app.core.middleware import (
     LoggingMiddleware,
     RateLimitMiddleware,
     TenantMiddleware,
-    TenantContextMiddleware,
 )
+from app.middleware.tenant import TenantContextMiddleware
 from app.core.redis import redis_client
 from app.integrations.chat_widget.router import router as chat_widget_router
 from app.integrations.whatsapp import router as whatsapp_router

@@ -1,12 +1,13 @@
 """Tenant Context Middleware for Row Level Security."""
+from typing import Optional
 
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 from starlette.responses import Response
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.core.database import async_session_maker
-from app.models.tenant import Tenant
+from app.core.database import async_session_factory
+from app.models import Tenant
 from sqlalchemy import select
 import logging
 
@@ -55,7 +56,7 @@ class TenantContextMiddleware(BaseHTTPMiddleware):
             return await call_next(request)
 
         # Resolve tenant and set RLS context
-        async with async_session_maker() as db:
+        async with async_session_factory() as db:
             try:
                 tenant = await self._resolve_tenant(db, tenant_identifier)
                 

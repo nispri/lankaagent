@@ -6,7 +6,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_session
-from app.models.tenant import Booking, Itinerary, Lead, WellnessProtocol
+from app.models import Booking, Itinerary, Lead, WellnessProtocol
 
 router = APIRouter()
 

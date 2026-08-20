@@ -9,7 +9,7 @@ from uuid import UUID
 from pydantic import BaseModel
 
 from app.core.database import get_session
-from app.models.tenant import Tenant, get_tenant_by_slug
+from app.models import Tenant, get_tenant_by_slug
 
 router = APIRouter(prefix="", tags=["Tenants"])
 
